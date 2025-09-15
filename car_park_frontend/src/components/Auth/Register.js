@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function Register() {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");  // changed from 'name'
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nic, setNic] = useState("");
@@ -12,7 +12,7 @@ export default function Register() {
     e.preventDefault();
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
-        name,
+        username,      // must match backend
         email,
         password,
         nic,
@@ -26,10 +26,10 @@ export default function Register() {
       }
 
       // Clear form
-      setName(""); setEmail(""); setPassword(""); setNic(""); setVehicleNumber("");
+      setUsername(""); setEmail(""); setPassword(""); setNic(""); setVehicleNumber("");
 
-    } catch (err) {
-      // Show exact backend message if exists
+    } 
+    catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
         alert("Error: " + err.response.data.message);
       } else {
@@ -37,11 +37,13 @@ export default function Register() {
       }
       console.error(err.response ? err.response.data : err.message);
     }
+   
+
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
       <input placeholder="NIC" value={nic} onChange={e => setNic(e.target.value)} />

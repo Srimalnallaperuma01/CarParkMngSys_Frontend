@@ -10,19 +10,44 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password });
-      localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      // POST login request
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+        email,
+        password
+      });
+
+      // Save token
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      alert("Login successful!");
+      navigate("/dashboard"); // redirect user
+
     } catch (err) {
-      console.error(err);
-      alert("Login failed");
+      // Handle backend error
+      if (err.response && err.response.data && err.response.data.message) {
+        alert("Error: " + err.response.data.message);
+      } else {
+        alert("Login failed: " + err.message);
+      }
+      console.error(err.response ? err.response.data : err.message);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <button type="submit">Login</button>
     </form>
   );
