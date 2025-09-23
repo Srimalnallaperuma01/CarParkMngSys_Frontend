@@ -7,9 +7,7 @@ export default function BookingList() {
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/bookings`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/bookings`, { headers: { Authorization: `Bearer ${token}` } });
       setBookings(res.data);
     };
     fetchBookings();
@@ -18,7 +16,9 @@ export default function BookingList() {
   return (
     <ul>
       {bookings.map(b => (
-        <li key={b._id}>{b.slotId} - {b.bookingDate} - {b.paymentStatus}</li>
+        <li key={b._id}>
+          {b.slot?.slotNumber || b.slot} - {new Date(b.bookingDate).toLocaleDateString()} - {b.paymentStatus}
+        </li>
       ))}
     </ul>
   );

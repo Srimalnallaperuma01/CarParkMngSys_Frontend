@@ -7,9 +7,7 @@ export default function SlotList() {
   useEffect(() => {
     const fetchSlots = async () => {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/parkingslots`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/parkingslots`, { headers: { Authorization: `Bearer ${token}` } });
       setSlots(res.data);
     };
     fetchSlots();

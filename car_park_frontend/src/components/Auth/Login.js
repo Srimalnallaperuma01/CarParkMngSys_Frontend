@@ -15,14 +15,15 @@ export default function Login() {
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+      <h1>Login</h1>
+      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
       <button type="submit">Login</button>
     </form>
   );
