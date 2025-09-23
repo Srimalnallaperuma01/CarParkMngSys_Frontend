@@ -12,19 +12,25 @@ export default function Login() {
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password });
       localStorage.setItem("token", res.data.token);
+      // optionally save user summary
+      localStorage.setItem("user", JSON.stringify(res.data.user || {}));
       navigate("/dashboard");
     } catch (err) {
-      console.error(err);
       alert(err.response?.data?.message || "Login failed");
+      console.error(err);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Login</h1>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-      <button type="submit">Login</button>
-    </form>
+    <div className="container">
+      <div className="card" style={{maxWidth:420, margin:"24px auto"}}>
+        <h2 className="h1">User Login</h2>
+        <form onSubmit={handleSubmit}>
+          <input required placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+          <input required type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
   );
 }

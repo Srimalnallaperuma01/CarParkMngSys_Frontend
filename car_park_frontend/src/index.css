@@ -1,73 +1,42 @@
-/* Global styles */
+/* Basic yellow theme */
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: #fff8e1; /* light yellow background */
-  color: #333;
+  font-family: 'Poppins', Arial, sans-serif;
+  background-color: #fffbea;
+  color: #222;
 }
 
-/* Form styles */
-form {
-  background-color: #fffde7;
-  padding: 2rem;
-  margin: 2rem auto;
-  width: 90%;
-  max-width: 400px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-form:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-}
+.container { padding: 20px; max-width: 1100px; margin: 0 auto; }
 
-input, button {
-  width: 100%;
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
-  border: 1px solid #fdd835; /* yellow border */
-  font-size: 1rem;
+.header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 12px 20px; background: linear-gradient(90deg,#fff7c2,#fff3a6);
+  border-bottom: 1px solid #ffd54f;
 }
+.brand { font-size: 20px; color:#c47f00; font-weight:700; }
 
-input:focus {
-  outline: none;
-  border-color: #fbc02d;
-  box-shadow: 0 0 5px #fbc02d;
+.card {
+  background-color: #fff8dc;
+  margin: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: transform .18s ease, box-shadow .18s ease;
 }
+.card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
 
+input, select {
+  padding: 10px; margin:8px 0; border-radius: 6px; border:1px solid #f0c419;
+  width:100%; max-width: 360px;
+}
 button {
-  background-color: #fbc02d;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  background-color:#ffb700; color:white; border:none; padding:10px 16px;
+  border-radius:6px; cursor:pointer; font-weight:600;
 }
+button:hover { background-color:#ff9f00; transform:scale(1.03); }
 
-button:hover {
-  background-color: #f9a825;
-}
+.grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.profile-pic { width:96px; height:96px; border-radius:50%; border:3px solid #ffd54f; }
 
-h1, h2 {
-  text-align: center;
-  color: #f9a825;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  padding: 0.8rem;
-  background-color: #fff9c4;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  transition: transform 0.2s ease;
-}
-
-li:hover {
-  transform: scale(1.02);
-}
+.small { font-size:0.9rem; color:#555; }
+.h1 { color:#b06b00; text-align:center; margin:12px 0; }
