@@ -22,7 +22,7 @@ const Login = () => {
 
     // TODO: Normal customer/admin login via backend
     console.log("Normal login:", { email, password });
-    navigate("/dashboard");
+    navigate("/dashboard/book-slot");
   };
 
   return (

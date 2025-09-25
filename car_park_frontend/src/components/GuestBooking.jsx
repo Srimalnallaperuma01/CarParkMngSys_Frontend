@@ -28,7 +28,7 @@ const GuestBooking = () => {
 
   return (
     <div className="guest-container">
-      <BackButton />
+      
       <h2>Guest Booking</h2>
       <form onSubmit={handleGuestBooking} className="guest-form">
         <input
@@ -44,6 +44,7 @@ const GuestBooking = () => {
           required
         />
         <button type="submit" className="book-btn">Book as Guest</button>
+        <BackButton />
       </form>
 
       {tempQR && (
@@ -52,6 +53,7 @@ const GuestBooking = () => {
           <QRCodeCanvas value={tempQR} size={128} />
           <p>QR valid for one-time entry.</p>
           <button className="download-btn" onClick={downloadQR}>Download QR</button>
+          
         </div>
       )}
     </div>

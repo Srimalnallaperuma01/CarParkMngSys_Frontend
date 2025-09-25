@@ -279,14 +279,14 @@ button:hover {
 }
 
 .book-btn {
-  padding: 0.75rem 1.5rem;
+  
   background-color: #014E9E;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 500;
-  margin-bottom: 1rem;
+  
 }
 
 .book-btn:hover {
