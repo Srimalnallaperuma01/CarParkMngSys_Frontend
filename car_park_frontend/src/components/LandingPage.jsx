@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
+import pimg from "../images/pimg.jpg"
 
 const slots = [
   { id: "A1", status: "available", price: 200 },
@@ -31,7 +32,7 @@ const LandingPage = () => {
 
       <section className="hero">
         <img
-          src="/hero.png"
+          src={pimg}
           alt="Car Parking Illustration"
           className="hero-img"
         />
