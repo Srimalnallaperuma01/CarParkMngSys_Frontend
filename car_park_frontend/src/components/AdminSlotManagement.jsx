@@ -1,33 +1,51 @@
-import React, { useState } from "react";
-
-const initialSlots = [
-  { id: "A1", type: "Small", status: "available" },
-  { id: "A2", type: "Medium", status: "booked" },
-  { id: "B1", type: "Large", status: "available" }
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AdminSlotManagement = () => {
-  const [slots, setSlots] = useState(initialSlots);
+  const [slots, setSlots] = useState([]);
   const [newSlot, setNewSlot] = useState({ id: "", type: "" });
 
-  const addSlot = () => {
-    if (!newSlot.id || !newSlot.type) return;
-    setSlots([...slots, { ...newSlot, status: "available" }]);
-    setNewSlot({ id: "", type: "" });
+  useEffect(() => {
+    fetchSlots();
+  }, []);
+
+  const fetchSlots = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/slots`);
+      setSlots(res.data);
+    } catch (err) {
+      alert("Failed to fetch slots: " + err.message);
+    }
   };
 
-  const toggleStatus = (id) => {
-    setSlots(
-      slots.map((s) =>
-        s.id === id
-          ? { ...s, status: s.status === "available" ? "booked" : "available" }
-          : s
-      )
-    );
+  const addSlot = async () => {
+    if (!newSlot.id || !newSlot.type) return alert("Enter slot ID and type!");
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/slots`, { ...newSlot, status: "available" });
+      setNewSlot({ id: "", type: "" });
+      fetchSlots();
+    } catch (err) {
+      alert("Failed to add slot: " + err.message);
+    }
   };
 
-  const deleteSlot = (id) => {
-    setSlots(slots.filter((s) => s.id !== id));
+  const toggleStatus = async (id, currentStatus) => {
+    const nextStatus = currentStatus === "available" ? "booked" : "available";
+    try {
+      await axios.put(`${process.env.REACT_APP_API_URL}/slots/${id}`, { status: nextStatus });
+      fetchSlots();
+    } catch (err) {
+      alert("Failed to toggle status: " + err.message);
+    }
+  };
+
+  const deleteSlot = async (id) => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/slots/${id}`);
+      fetchSlots();
+    } catch (err) {
+      alert("Failed to delete slot: " + err.message);
+    }
   };
 
   return (
@@ -51,7 +69,7 @@ const AdminSlotManagement = () => {
         {slots.map((slot) => (
           <li key={slot.id} style={{ margin: "10px 0" }}>
             {slot.id} ({slot.type}) - Status: {slot.status}
-            <button onClick={() => toggleStatus(slot.id)} style={{ marginLeft: "10px" }}>
+            <button onClick={() => toggleStatus(slot.id, slot.status)} style={{ marginLeft: "10px" }}>
               Toggle Status
             </button>
             <button onClick={() => deleteSlot(slot.id)} style={{ marginLeft: "10px" }}>

@@ -1,63 +1,93 @@
-import React, { useState, useContext } from "react";
-import { SlotsContext } from "../context/SlotContext";
-import { BookingContext } from "../context/BookingContext";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { QRCodeCanvas } from "qrcode.react";
-import BackButton from "./BackButton";
+import { UserContext } from "../context/UserContext";
+import "./BookSlot.css";
 
 const BookSlot = () => {
-  const { slotsData, setSlotsData } = useContext(SlotsContext);
-  const { addBooking } = useContext(BookingContext);
+  const { currentUser } = useContext(UserContext);
+  const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+  const [slots, setSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [qrValue, setQrValue] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(null);
 
-  const availableSlots = slotsData.filter(slot => slot.status === "available");
-
-  const handleBooking = () => {
-    if (!selectedSlot || !date || !time) {
-      alert("Select slot, date, and time.");
-      return;
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+    } else {
+      fetchSlots();
     }
+  }, [currentUser, navigate]);
 
-    const qr = `Slot:${selectedSlot}|Date:${date}|Time:${time}|ID:${Math.floor(Math.random()*100000)}`;
-    setQrValue(qr);
+  const fetchSlots = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/parking`);
+      setSlots(res.data);
+    } catch (err) {
+      alert("Error fetching slots: " + (err.response?.data?.message || err.message));
+    }
+  };
 
-    setSlotsData(slotsData.map(slot =>
-      slot.id === selectedSlot ? { ...slot, status: "booked" } : slot
-    ));
+  const handleBooking = async (slot) => {
+    if (!slot) return alert("Please select a slot!");
+    if (slot.status === "Booked") return alert("Slot already booked!");
 
-    addBooking({ slot: selectedSlot, date, time, qr });
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      };
+
+      const bookingData = {
+        slotId: slot.slotNumber,
+      };
+
+      const res = await axios.post(`${API_URL}/bookings`, bookingData, config);
+
+      setBookingSuccess(res.data);
+      fetchSlots();
+      setSelectedSlot(null);
+    } catch (err) {
+      alert("Booking failed: " + (err.response?.data?.message || err.message));
+    }
   };
 
   return (
-    <div className="bookslot-container">
-      <BackButton />
+    <div className="book-slot-container">
       <h2>Book a Slot</h2>
-
       <div className="slots-grid">
-        {availableSlots.length === 0 ? (
-          <p>No available slots.</p>
-        ) : (
-          availableSlots.map(slot => (
-            <div
-              key={slot.id}
-              className={`slot-card ${selectedSlot === slot.id ? "selected" : ""}`}
-              style={{ backgroundColor: slot.status === "available" ? "green" : "red" }}
-              onClick={() => setSelectedSlot(slot.id)}
-            >
-              {slot.id} {selectedSlot === slot.id && "(Selected)"}
-            </div>
-          ))
-        )}
+        {slots.map((slot) => (
+          <div
+            key={slot._id}
+            className={`slot-card ${slot.status} ${selectedSlot === slot ? "selected" : ""}`}
+            onClick={() => slot.status === "Available" && setSelectedSlot(slot)}
+          >
+            {slot.slotNumber} ({slot.status})
+          </div>
+        ))}
       </div>
 
-      <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-      <input type="time" value={time} onChange={e => setTime(e.target.value)} />
-      <button onClick={handleBooking}>Book & Generate QR</button>
+      <button
+        onClick={() => handleBooking(selectedSlot)}
+        disabled={!selectedSlot}
+        className="book-button"
+      >
+        Book Selected Slot
+      </button>
 
-      {qrValue && <QRCodeCanvas value={qrValue} size={128} />}
+      {bookingSuccess && (
+        <div className="booking-confirmation">
+          <h3>Booking Confirmed!</h3>
+          <p>Slot: {bookingSuccess.booking.slot}</p>
+          <p>User: {currentUser.username}</p>
+          {/* Only pass booking ID to QR code to avoid "Data too long" */}
+          <QRCodeCanvas value={`booking:${bookingSuccess.booking._id}`} />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,0 +1,115 @@
+/* Sidebar */
+.admin-dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #014E9E;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar h3 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.sidebar h3 a {
+  color: white;
+  text-decoration: none;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sidebar ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Main content */
+.admin-dashboard-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.admin-dashboard-content h2 {
+  margin-bottom: 20px;
+}
+
+.admin-dashboard-content h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Table for bookings */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table th,
+table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+table th {
+  background-color: #014E9E;
+  color: white;
+}
+
+/* Slot management */
+.admin-slot-container {
+  margin-top: 20px;
+}
+
+.add-slot input {
+  padding: 5px;
+  margin-right: 5px;
+}
+
+.add-slot button {
+  background-color: #014E9E;
+  color: white;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
+
+ul li button {
+  margin-left: 10px;
+  background-color: #ff4d4d;
+  color: white;
+}

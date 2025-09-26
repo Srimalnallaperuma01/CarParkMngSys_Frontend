@@ -1,0 +1,56 @@
+.book-slot-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.slot-card {
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.slot-card.available {
+  background-color: #4caf50;
+}
+
+.slot-card.booked {
+  background-color: #f44336;
+  cursor: not-allowed;
+}
+
+.slot-card.selected {
+  border: 3px solid #ffd700;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #ffd700;
+}
+
+.book-button {
+  padding: 10px 20px;
+  background-color: #014E9E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.book-button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.booking-confirmation {
+  margin-top: 20px;
+}

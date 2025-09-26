@@ -1,34 +1,39 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { defaultAdmin } from "../data/defaultAdmin";
 import { UserContext } from "../context/UserContext";
-import BackButton from "../components/BackButton";
+import "./Login.css";
 
 const Login = () => {
+  const { loginUser } = useContext(UserContext);
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const { setCurrentUser } = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      // Call backend login
+      const userData = await loginUser(email, password);
 
-    // Super Admin login
-    if (email === defaultAdmin.email && password === defaultAdmin.password) {
-      setCurrentUser(defaultAdmin);
-      navigate("/admin");
-      return;
+      // Redirect based on role
+      if (userData.role === "admin" || userData.role === "superadmin") {
+        navigate("/admin"); // Admins go to admin dashboard
+      } else {
+        navigate("/dashboard/book-slot"); // Users go to user dashboard
+      }
+    } catch (err) {
+      alert("Login failed: " + err);
+    } finally {
+      setLoading(false);
     }
-
-    // TODO: Normal customer/admin login via backend
-    console.log("Normal login:", { email, password });
-    navigate("/dashboard/book-slot");
   };
 
   return (
     <div className="login-container">
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Email"
@@ -43,8 +48,9 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
-        <BackButton></BackButton>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );

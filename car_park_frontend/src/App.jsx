@@ -1,8 +1,6 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { BookingProvider } from "./context/BookingContext";
-import { SlotsProvider } from "./context/SlotContext";
-import { UserContext, UserProvider } from "./context/UserContext"; // If you plan to use auth
+import { Routes, Route, Navigate } from "react-router-dom";
+import { UserContext } from "./context/UserContext";
 
 import "./components/App.css";
 
@@ -21,9 +19,10 @@ import Notifications from "./components/Notifications";
 
 import AdminDashboard from "./components/AdminDashboard";
 import AdminSlotManagement from "./components/AdminSlotManagement";
+import AdminBookings from "./components/AdminBookings";
 
 function AppRoutes() {
-  const { currentUser } = useContext(UserContext); // get logged-in user
+  const { currentUser } = useContext(UserContext);
 
   return (
     <Routes>
@@ -36,18 +35,28 @@ function AppRoutes() {
       <Route path="/slots" element={<CheckAvailability />} />
 
       {/* Customer Dashboard */}
-      <Route path="/dashboard" element={<Dashboard />}>
+      <Route
+        path="/dashboard/*"
+        element={
+          currentUser && currentUser.role === "user" ? (
+            <Dashboard />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      >
         <Route path="book-slot" element={<BookSlot />} />
         <Route path="my-bookings" element={<MyBookings />} />
         <Route path="payments" element={<Payments />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
 
-      {/* Admin Dashboard (Protected) */}
+      {/* Admin Dashboard */}
       <Route
-        path="/admin"
+        path="/admin/*"
         element={
-          currentUser && currentUser.role === "superadmin" ? (
+          currentUser &&
+          (currentUser.role === "admin" || currentUser.role === "superadmin") ? (
             <AdminDashboard />
           ) : (
             <Navigate to="/login" />
@@ -56,6 +65,7 @@ function AppRoutes() {
       >
         <Route path="users" element={<div>Manage Users</div>} />
         <Route path="slots" element={<AdminSlotManagement />} />
+        <Route path="bookings" element={<AdminBookings />} />
         <Route path="payments" element={<div>Approve Payments</div>} />
         <Route path="reports" element={<div>Reports</div>} />
         <Route path="analytics" element={<div>Analytics</div>} />
@@ -65,17 +75,7 @@ function AppRoutes() {
 }
 
 function App() {
-  return (
-    <UserProvider>
-      <BookingProvider>
-        <SlotsProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
-        </SlotsProvider>
-      </BookingProvider>
-    </UserProvider>
-  );
+  return <AppRoutes />;
 }
 
 export default App;
