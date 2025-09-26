@@ -1,12 +1,5 @@
-import React from "react";
-
-const slots = [
-  { id: "A1", status: "available", price: 200 },
-  { id: "A2", status: "booked", price: 200 },
-  { id: "B1", status: "available", price: 250 },
-  { id: "B2", status: "pending", price: 250 },
-  { id: "C1", status: "available", price: 300 },
-];
+import React, { useContext } from "react";
+import { SlotsContext } from "../context/SlotContext";
 
 const getStatusColor = (status) => {
   if (status === "available") return "green";
@@ -15,6 +8,8 @@ const getStatusColor = (status) => {
 };
 
 const CheckAvailability = () => {
+  const { slotsData } = useContext(SlotsContext); // ✅ get slots from context
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>Check Slot Availability</h2>
@@ -27,13 +22,19 @@ const CheckAvailability = () => {
           </tr>
         </thead>
         <tbody>
-          {slots.map((slot) => (
+          {slotsData.map((slot) => (
             <tr key={slot.id}>
               <td>{slot.id}</td>
-              <td style={{ backgroundColor: getStatusColor(slot.status), color: slot.status === "pending" ? "black" : "white", textAlign: "center" }}>
+              <td
+                style={{
+                  backgroundColor: getStatusColor(slot.status),
+                  color: slot.status === "pending" ? "black" : "white",
+                  textAlign: "center",
+                }}
+              >
                 {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
               </td>
-              <td>{slot.price}</td>
+              <td>{slot.price || "-"}</td>
             </tr>
           ))}
         </tbody>

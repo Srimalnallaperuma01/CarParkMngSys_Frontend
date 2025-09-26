@@ -9,10 +9,7 @@ const GuestBooking = () => {
 
   const handleGuestBooking = (e) => {
     e.preventDefault();
-    if (!nic || !vehicle) {
-      alert("Enter NIC and Vehicle number");
-      return;
-    }
+    if (!nic || !vehicle) return;
     const qr = `Guest|NIC:${nic}|Vehicle:${vehicle}|ID:${Math.floor(Math.random() * 100000)}`;
     setTempQR(qr);
   };
@@ -28,21 +25,10 @@ const GuestBooking = () => {
 
   return (
     <div className="guest-container">
-      
       <h2>Guest Booking</h2>
       <form onSubmit={handleGuestBooking} className="guest-form">
-        <input
-          placeholder="NIC"
-          value={nic}
-          onChange={(e) => setNic(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Vehicle Number"
-          value={vehicle}
-          onChange={(e) => setVehicle(e.target.value)}
-          required
-        />
+        <input placeholder="NIC" value={nic} onChange={e => setNic(e.target.value)} required />
+        <input placeholder="Vehicle Number" value={vehicle} onChange={e => setVehicle(e.target.value)} required />
         <button type="submit" className="book-btn">Book as Guest</button>
         <BackButton />
       </form>
@@ -53,7 +39,6 @@ const GuestBooking = () => {
           <QRCodeCanvas value={tempQR} size={128} />
           <p>QR valid for one-time entry.</p>
           <button className="download-btn" onClick={downloadQR}>Download QR</button>
-          
         </div>
       )}
     </div>

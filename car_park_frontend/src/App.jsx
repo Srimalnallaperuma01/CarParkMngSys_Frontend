@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { BookingProvider } from "./context/BookingContext";
-import "./components/App.css";
+import { SlotsProvider } from "./context/SlotContext";
+import { UserContext, UserProvider } from "./context/UserContext"; // If you plan to use auth
 
-import { UserProvider, UserContext } from "./context/UserContext";
-import CheckAvailability from "./components/CheckAvailability";
+import "./components/App.css";
 
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import GuestBooking from "./components/GuestBooking";
-import EntryExitGate from './components/EntryExitGate';
+import EntryExitGate from "./components/EntryExitGate";
+import CheckAvailability from "./components/CheckAvailability";
 
 import Dashboard from "./components/Dashboard";
 import BookSlot from "./components/BookSlot";
@@ -19,10 +20,10 @@ import Payments from "./components/Payments";
 import Notifications from "./components/Notifications";
 
 import AdminDashboard from "./components/AdminDashboard";
-import AdminSlotManagement from './components/AdminSlotManagement';
+import AdminSlotManagement from "./components/AdminSlotManagement";
 
 function AppRoutes() {
-  const { currentUser } = React.useContext(UserContext);
+  const { currentUser } = useContext(UserContext); // get logged-in user
 
   return (
     <Routes>
@@ -59,7 +60,6 @@ function AppRoutes() {
         <Route path="reports" element={<div>Reports</div>} />
         <Route path="analytics" element={<div>Analytics</div>} />
       </Route>
-
     </Routes>
   );
 }
@@ -68,9 +68,11 @@ function App() {
   return (
     <UserProvider>
       <BookingProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
+        <SlotsProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </SlotsProvider>
       </BookingProvider>
     </UserProvider>
   );
