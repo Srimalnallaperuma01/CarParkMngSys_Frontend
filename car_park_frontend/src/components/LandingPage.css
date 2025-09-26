@@ -29,8 +29,9 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 15px 20px;
+  padding: 10px 20px;
   width: 100%;
+  margin-bottom: 0;
 }
 
 /* Header left (titles) */
@@ -73,24 +74,55 @@ body {
   display: block;
   max-width: 300px;
   width: 100%;
-  margin: 20px auto; /* center horizontally */
+  margin: 10px auto; /* center horizontally */
   z-index: 5;
 }
 
+.pimg{
+  margin: 0;
+
+}
+
 /* Quick info */
+/* Parent container */
+.quick-info {
+
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: center;     /* vertical center */
+           /* full viewport height */
+}
+
+/* Your list */
 .home-list {
   list-style: none;
-  padding: 0;
-  margin: 10px 0;
+  padding: 20px;
+  margin: 0;               /* reset margin */
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* center items inside the list */
   text-align: center;
+  background-color: #014E9E;
+  height: fit-content;
+  width: fit-content;
+  border-radius: 8px;      /* optional: nice rounded corners */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* optional: subtle shadow */
+  margin-bottom: 10px;
+  
+  
 }
+
 
 .home-list li {
   margin: 10px 0;
   font-size: 14px;
   
-  color: #000000;
+  color: #ffffff;
   font-family: 'Poppins', sans-serif;
+}
+
+.home-list h3{
+  color: #ffffff;
 }
 
 /* CTA buttons */
@@ -129,8 +161,8 @@ ul {
   height: 90vh;
   width: 100%;
   /* Add blur */
-  filter: blur(8px); /* Adjust px for intensity */
-  opacity: 0.6;
+  filter: blur(6px); /* Adjust px for intensity */
+  opacity: 0.8;
 }
 
 .homecontents{
@@ -141,7 +173,8 @@ ul {
   font-size: 20px;
   font-weight: bold;
   border-radius: 10px;
-  margin: 20px;
+  margin: 0;
+  
 }
 
 .hometable{
@@ -153,3 +186,17 @@ ul {
 }
 
 
+.homecontents h2 {
+  color: rgb(30, 21, 21);
+  stroke: #ffffff;
+  stroke-width: 10px;
+  filter: drop-shadow(0.5s 0.5s 0.5s #000000);
+  
+}
+
+.homecontents p {
+  color: #000000;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}

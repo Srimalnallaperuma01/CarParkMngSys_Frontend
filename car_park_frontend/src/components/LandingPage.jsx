@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
 import pimg from "../images/pimg.jpg";
-import bg from "../images/bg.jpg";
+import bg1 from "../images/bg1.jpg";
 import { SlotsContext } from "../context/SlotContext"; // ✅ import SlotsContext
 
 const getStatusColor = (status) => {
@@ -35,7 +35,7 @@ const LandingPage = () => {
         </div>
       </header>
       
-      <img className="bgimg" src={bg} alt="Background" />
+      <img className="bgimg" src={bg1} alt="Background" />
 
       <div className="homecontents">
         <section className="hero">
@@ -44,9 +44,9 @@ const LandingPage = () => {
       </section>
 
       <section className="quick-info">
-        <h3>Quick Info</h3>
+        
         <ul className="home-list">
-          <li></li>
+          <h3>Quick Info</h3>
           <li>Parking Fees: LKR 200–500 per hour depending on slot type</li>
           <li>Slot Status: Real-time availability with booking option</li>
           <li>Rules: Safe parking, valid vehicle ID required, no overnight parking without approval</li>
