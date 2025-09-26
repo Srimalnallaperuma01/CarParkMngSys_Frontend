@@ -1,68 +1,115 @@
-/* Reset some defaults */
+/* Register.css - matched with Login.css */
+
+/* Container styling */
 .register-container {
   max-width: 400px;
-  margin: 50px auto;
-  padding: 30px 20px;
-  border-radius: 10px;
-  background-color: #f7f7f7;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
+  margin: 60px auto;
+  padding: 40px 30px;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #e6f0ff, #ffffff);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeIn 0.8s ease forwards;
+  opacity: 0;
 }
 
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Heading */
 .register-container h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 35px;
   color: #014e9e;
+  font-size: 28px;
+  letter-spacing: 1px;
+  animation: slideDown 0.6s ease forwards;
 }
 
-.register-form {
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Form styling */
+.register-container form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px; /* Space between fields */
 }
 
-.register-form input {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+/* Input fields */
+.register-container input {
+  padding: 14px 16px;
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
   font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.register-form input:focus {
+.register-container input:focus {
   border-color: #014e9e;
+  box-shadow: 0 0 12px rgba(1, 78, 158, 0.3);
   outline: none;
+  transform: scale(1.02);
 }
 
-.register-form button {
-  padding: 12px;
+/* Button */
+.register-container button {
+  padding: 14px;
   background-color: #014e9e;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.register-form button:hover {
+.register-container button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+}
+
+.register-container button:hover::after {
+  left: 0;
+}
+
+.register-container button:hover {
   background-color: #013a7a;
+  transform: scale(1.05);
 }
 
-.register-form button:disabled {
+.register-container button:disabled {
   background-color: #888;
   cursor: not-allowed;
+  transform: scale(1);
 }
 
 /* Responsive */
 @media (max-width: 480px) {
   .register-container {
     margin: 30px 10px;
-    padding: 20px 15px;
+    padding: 30px 20px;
   }
 
-  .register-form input,
-  .register-form button {
+  .register-container h2 {
+    font-size: 24px;
+  }
+
+  .register-container input,
+  .register-container button {
     font-size: 14px;
-    padding: 10px;
+    padding: 12px;
   }
 }
