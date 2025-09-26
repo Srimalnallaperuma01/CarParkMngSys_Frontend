@@ -1,28 +1,91 @@
-.landing-container {
-  text-align: center;
-  padding: 20px;
+/* Reset default spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+/* Landing container */
+.landing-container {
+  text-align: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 0;
+  margin: 0;
+}
+
+/* Header */
 .landing-header {
   display: flex;
-  justify-content: space-between;
-  padding: 20px;
+  justify-content: space-between; /* title left, buttons right */
+  align-items: center;
   background-color: #014E9E;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 15px 20px;
+  width: 100%;
+}
+
+/* Header left (titles) */
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#main1 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.headername h5{
+    color: rgb(255, 255, 110);
+}
+
+/* Auth buttons */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .auth-buttons a {
-  margin-left: 10px;
   text-decoration: none;
   color: white;
   font-weight: bold;
+  padding: 6px 10px;
 }
 
-.hero-img {
-  max-width: 300px;
+/* Hero */
+.hero {
   margin: 20px 0;
 }
 
+.hero-img {
+  display: block;
+  max-width: 300px;
+  width: 100%;
+  margin: 20px auto; /* center horizontally */
+  z-index: 5;
+}
+
+/* Quick info */
+.home-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  text-align: center;
+}
+
+/* CTA buttons */
 .cta-buttons .btn {
   display: inline-block;
   margin: 10px;
@@ -31,4 +94,17 @@
   color: white;
   text-decoration: none;
   border-radius: 5px;
+  cursor: pointer;
+}
+
+.cta-buttons .btn:hover {
+  background-color: #012f6b;
+}
+
+/* Lists */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: start;
 }

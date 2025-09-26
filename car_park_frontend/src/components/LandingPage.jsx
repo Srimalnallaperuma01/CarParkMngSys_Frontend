@@ -23,7 +23,10 @@ const LandingPage = () => {
   return (
     <div className="landing-container">
       <header className="landing-header">
-        <h1>Car Park Management System</h1>
+        <ul className="headername">
+          <li><h1 id="main1">Car Park Management System</h1></li>
+          <li><h5 id="sub1">Easy Parking with QR Code</h5></li>
+        </ul>
         <div className="auth-buttons">
           <Link to="/login">Login</Link>
           <Link to="/register">Register</Link>
@@ -41,7 +44,7 @@ const LandingPage = () => {
 
       <section className="quick-info">
         <h3>Quick Info</h3>
-        <ul>
+        <ul className="home-list">
           <li>Parking Rates: $2/hour</li>
           <li>Rules & Availability: View-only</li>
         </ul>
