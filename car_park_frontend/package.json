@@ -10,10 +10,10 @@
     "axios": "^1.12.2",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
-    "qrcode.react": "^4.2.0",
+    "qrcode.react": "^3.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.2",
+    "react-router-dom": "^6.30.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },

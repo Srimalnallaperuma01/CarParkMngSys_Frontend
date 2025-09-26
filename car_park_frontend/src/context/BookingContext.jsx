@@ -6,16 +6,9 @@ export const BookingContext = createContext();
 export const BookingProvider = ({ children }) => {
   const [bookings, setBookings] = useState([]);
 
-  const addBooking = (booking) => {
-    setBookings(prev => [...prev, booking]);
-  };
+  const addBooking = (booking) => setBookings(prev => [...prev, booking]);
 
-  const cancelBooking = (qr, slotsData, setSlotsData) => {
-    setBookings(prev => prev.filter(b => b.qr !== qr));
-    setSlotsData(slotsData.map(slot =>
-      slot.id === qr.split("|")[0].split(":")[1] ? { ...slot, status: "available" } : slot
-    ));
-  };
+  const cancelBooking = (bookingId) => setBookings(prev => prev.filter(b => b._id !== bookingId));
 
   return (
     <BookingContext.Provider value={{ bookings, setBookings, addBooking, cancelBooking }}>

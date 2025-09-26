@@ -1,20 +1,27 @@
 // src/context/SlotsContext.jsx
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 
 export const SlotsContext = createContext();
 
 export const SlotsProvider = ({ children }) => {
-  // Initial slots with status and price
-  const [slotsData, setSlotsData] = useState([
-    { id: "A1", status: "available", price: 200 },
-    { id: "A2", status: "booked", price: 200 },
-    { id: "B1", status: "available", price: 250 },
-    { id: "B2", status: "pending", price: 250 },
-    { id: "C1", status: "available", price: 300 },
-  ]);
+  const [slotsData, setSlotsData] = useState([]);
+
+  const fetchSlots = async () => {
+    try {
+      const res = await axiosInstance.get("/parking");
+      setSlotsData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch slots:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlots();
+  }, []);
 
   return (
-    <SlotsContext.Provider value={{ slotsData, setSlotsData }}>
+    <SlotsContext.Provider value={{ slotsData, setSlotsData, fetchSlots }}>
       {children}
     </SlotsContext.Provider>
   );

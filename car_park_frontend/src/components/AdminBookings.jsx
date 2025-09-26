@@ -1,6 +1,6 @@
 // src/components/AdminBookings.jsx
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import { UserContext } from "../context/UserContext";
 
 const AdminBookings = () => {
@@ -8,16 +8,10 @@ const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axios.get(`${API_URL}/admin/bookings`, {
-          headers: {
-            Authorization: `Bearer ${currentUser.token}`,
-          },
-        });
+        const res = await axiosInstance.get("/admin/bookings");
         setBookings(res.data.bookings);
       } catch (err) {
         console.error(err);
@@ -26,11 +20,11 @@ const AdminBookings = () => {
       }
     };
     fetchBookings();
-  }, [currentUser]);
+  }, []);
 
   const updateStatus = async (bookingId, status) => {
     try {
-      await axios.patch(`${API_URL}/admin/bookings/${bookingId}`, { status });
+      await axiosInstance.patch(`/admin/bookings/${bookingId}`, { status });
       setBookings(bookings.map(b => (b._id === bookingId ? { ...b, status } : b)));
     } catch (err) {
       console.error(err);
@@ -39,7 +33,7 @@ const AdminBookings = () => {
 
   const cancelBooking = async (bookingId) => {
     try {
-      await axios.delete(`${API_URL}/admin/bookings/${bookingId}`);
+      await axiosInstance.delete(`/admin/bookings/${bookingId}`);
       setBookings(bookings.filter(b => b._id !== bookingId));
     } catch (err) {
       console.error(err);
@@ -65,9 +59,9 @@ const AdminBookings = () => {
           <tbody>
             {bookings.map(b => (
               <tr key={b._id}>
-                <td>{b.slot.slotNumber}</td>
-                <td>{b.customer ? b.customer.name : b.guestName}</td>
-                <td>{new Date(b.bookingDate).toLocaleDateString()}</td>
+                <td>{b.slot?.slotNumber}</td>
+                <td>{b.customer?.username || b.guestName || "Guest"}</td>
+                <td>{new Date(b.bookingDate).toLocaleString()}</td>
                 <td>{b.status}</td>
                 <td>
                   {b.status !== "approved" && (

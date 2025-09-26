@@ -1,4 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+// src/context/UserContext.jsx
+import React, { createContext, useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 import axios from "axios";
 
 export const UserContext = createContext();
@@ -8,45 +10,39 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
-  // ✅ Login (users -> /auth/login, admins -> /admin/login)
+  // login tries admin first then user (keeps compatibility)
   const loginUser = async (email, password) => {
     try {
-      // First try admin login
-      let res;
+      // try admin login endpoint first
       try {
-        res = await axios.post(`${API_URL}/admin/login`, { email, password });
-      } catch {
-        // If not admin, fallback to user login
-        res = await axios.post(`${API_URL}/auth/login`, { email, password });
+        const res = await axiosInstance.post("/admin/login", { email, password });
+        const admin = res.data.admin;
+        const token = res.data.token;
+        const userObj = { id: admin.id, name: admin.name, email: admin.email, role: admin.role, token };
+        localStorage.setItem("user", JSON.stringify(userObj));
+        localStorage.setItem("token", token);
+        setCurrentUser(userObj);
+        return userObj;
+      } catch (errAdmin) {
+        // fallback to auth login
+        const res = await axiosInstance.post("/auth/login", { email, password });
+        const token = res.data.token;
+        const user = res.data.user;
+        const userObj = { id: user.id, name: user.name, email: user.email, role: user.role, token };
+        localStorage.setItem("user", JSON.stringify(userObj));
+        localStorage.setItem("token", token);
+        setCurrentUser(userObj);
+        return userObj;
       }
-
-      const data = res.data;
-      const userData = data.user || data.admin; // backend may return user or admin
-
-      const userObj = {
-        id: userData._id || userData.id,
-        name: userData.name || userData.username,
-        email: userData.email,
-        role: userData.role || "user",
-        token: data.token,
-      };
-
-      // Save to localStorage
-      localStorage.setItem("user", JSON.stringify(userObj));
-      localStorage.setItem("token", data.token);
-
-      setCurrentUser(userObj);
-      return userObj;
     } catch (err) {
       console.error("Login error:", err.response?.data?.message || err.message);
       throw err.response?.data?.message || "Login failed";
     }
   };
 
-  // ✅ Register (for normal users)
   const registerUser = async (userData) => {
     try {
-      const res = await axios.post(`${API_URL}/auth/register`, userData);
+      const res = await axiosInstance.post("/auth/register", userData);
       return res.data;
     } catch (err) {
       console.error("Register error:", err.response?.data?.message || err.message);
@@ -54,18 +50,18 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // ✅ Logout
   const logoutUser = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setCurrentUser(null);
   };
 
-  // ✅ Load user on refresh
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
+    const saved = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    if (saved && token) {
+      setCurrentUser(JSON.parse(saved));
+      // axiosInstance interceptor already reads token from localStorage
     }
   }, []);
 
