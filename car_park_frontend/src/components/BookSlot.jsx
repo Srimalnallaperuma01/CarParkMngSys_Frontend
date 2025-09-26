@@ -1,4 +1,3 @@
-// src/components/BookSlot.jsx
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
@@ -13,12 +12,13 @@ const BookSlot = () => {
   const [slots, setSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(null);
+  const [paymentSlip, setPaymentSlip] = useState(null);
 
   useEffect(() => {
     if (!currentUser) navigate("/login");
     fetchSlots();
     // eslint-disable-next-line
-  }, [currentUser, navigate]);
+  }, [currentUser]);
 
   const fetchSlots = async () => {
     try {
@@ -29,16 +29,30 @@ const BookSlot = () => {
     }
   };
 
-  const handleBooking = async (slot) => {
-    if (!slot) return alert("Please select a slot!");
-    if (slot.status === "Booked") return alert("Slot already booked!");
+  const handleBooking = async () => {
+    if (!selectedSlot) return alert("Please select a slot!");
+    if (!paymentSlip) return alert("Please upload a payment slip!");
 
     try {
-      const bookingData = { slotId: slot.slotNumber };
-      const res = await axiosInstance.post("/bookings", bookingData);
-      setBookingSuccess(res.data);
+      // 1️⃣ Create booking
+      const bookingRes = await axiosInstance.post("/bookings", {
+        slotId: selectedSlot.slotNumber // send slotNumber
+      });
+
+      const bookingId = bookingRes.data.booking._id;
+
+      // 2️⃣ Upload payment slip
+      const formData = new FormData();
+      formData.append("slip", paymentSlip);
+
+      await axiosInstance.post(`/bookings/${bookingId}/upload-slip`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      setBookingSuccess(bookingRes.data);
       fetchSlots();
       setSelectedSlot(null);
+      setPaymentSlip(null);
     } catch (err) {
       alert("Booking failed: " + (err.response?.data?.message || err.message));
     }
@@ -47,17 +61,33 @@ const BookSlot = () => {
   return (
     <div className="book-slot-container">
       <h2>Book a Slot</h2>
+
       <div className="slots-grid">
         {slots.map((slot) => (
-          <div key={slot._id}
-               className={`slot-card ${slot.status.toLowerCase()} ${selectedSlot === slot ? "selected" : ""}`}
-               onClick={() => slot.status === "Available" && setSelectedSlot(slot)}>
+          <div
+            key={slot._id}
+            className={`slot-card ${slot.status.toLowerCase()} ${
+              selectedSlot === slot ? "selected" : ""
+            }`}
+            onClick={() => slot.status === "Available" && setSelectedSlot(slot)}
+          >
             {slot.slotNumber} ({slot.status})
           </div>
         ))}
       </div>
 
-      <button onClick={() => handleBooking(selectedSlot)} disabled={!selectedSlot} className="book-button">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setPaymentSlip(e.target.files[0])}
+        style={{ marginTop: "10px" }}
+      />
+
+      <button
+        onClick={handleBooking}
+        disabled={!selectedSlot || !paymentSlip}
+        className="book-button"
+      >
         Book Selected Slot
       </button>
 

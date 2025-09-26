@@ -9,15 +9,22 @@ export const SlotsProvider = ({ children }) => {
 
   const fetchSlots = async () => {
     try {
-      const res = await axiosInstance.get("/parking");
-      setSlotsData(res.data);
+      const res = await axiosInstance.get("/parking"); // make sure backend route matches
+      if (res.data) setSlotsData(res.data);
     } catch (err) {
       console.error("Failed to fetch slots:", err);
     }
   };
 
   useEffect(() => {
-    fetchSlots();
+    fetchSlots(); // initial fetch
+
+    // Poll every 3 seconds for live updates
+    const interval = setInterval(() => {
+      fetchSlots();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

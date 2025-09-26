@@ -51,10 +51,16 @@ const MyBookings = () => {
       {bookings.length === 0 && <p>No bookings yet.</p>}
       {bookings.map((b) => (
         <div key={b._id} className="booking-card">
-          Slot: {b.slot?.slotNumber || b.slot} | Date: {new Date(b.bookingDate).toLocaleString()}
-          <div ref={el => (qrRefs.current[b._id] = el)} style={{ display: "inline-block", marginLeft: "10px" }}>
+          <p>Slot: {b.slot?.slotNumber || b.slot} | Date: {new Date(b.bookingDate).toLocaleString()}</p>
+          <div ref={el => (qrRefs.current[b._id] = el)} style={{ display: "inline-block", margin: "10px" }}>
             <QRCodeCanvas value={b.qrCode || `booking:${b._id}`} size={100} />
           </div>
+          {b.paymentSlip && (
+            <div>
+              <p>Payment Slip:</p>
+              <img src={`http://localhost:5000/${b.paymentSlip}`} alt="Payment Slip" style={{ maxWidth: "200px" }} />
+            </div>
+          )}
           <button onClick={() => downloadQR(b._id)}>Download QR</button>
           <button onClick={() => cancelBooking(b)} style={{ marginLeft: "10px", background: "#f44336", color: "#fff" }}>
             Cancel Booking

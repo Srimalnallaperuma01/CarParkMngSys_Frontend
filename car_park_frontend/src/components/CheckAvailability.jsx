@@ -1,14 +1,43 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
 
 const getStatusColor = (status) => {
-  if (status === "available") return "green";
-  if (status === "booked") return "red";
-  if (status === "pending") return "yellow";
+  switch (status.toLowerCase()) {
+    case "available": return "green";
+    case "booked": return "red";
+    case "pending": return "yellow";
+    default: return "grey";
+  }
 };
 
 const CheckAvailability = () => {
-  const { slotsData } = useContext(SlotsContext); // ✅ get slots from context
+  const { slotsData, setSlotsData } = useContext(SlotsContext);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSlots = async () => {
+    try {
+      // Fetch from backend
+      const res = await axiosInstance.get("/parking"); // make sure this matches your backend route
+      if (res.data) setSlotsData(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching slots:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlots(); // initial fetch
+
+    // Poll every 3 seconds
+    const interval = setInterval(() => {
+      fetchSlots();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) return <p>Loading slots...</p>;
 
   return (
     <div style={{ padding: "20px" }}>
@@ -23,12 +52,12 @@ const CheckAvailability = () => {
         </thead>
         <tbody>
           {slotsData.map((slot) => (
-            <tr key={slot.id}>
-              <td>{slot.id}</td>
+            <tr key={slot._id || slot.id}>
+              <td>{slot.slotNumber || slot.id}</td>
               <td
                 style={{
                   backgroundColor: getStatusColor(slot.status),
-                  color: slot.status === "pending" ? "black" : "white",
+                  color: slot.status.toLowerCase() === "pending" ? "black" : "white",
                   textAlign: "center",
                 }}
               >

@@ -85,6 +85,14 @@ body {
   text-align: center;
 }
 
+.home-list li {
+  margin: 10px 0;
+  font-size: 14px;
+  
+  color: #000000;
+  font-family: 'Poppins', sans-serif;
+}
+
 /* CTA buttons */
 .cta-buttons .btn {
   display: inline-block;
@@ -108,3 +116,40 @@ ul {
   margin: 0;
   text-align: start;
 }
+
+.bgimg {
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  overflow: hidden;
+  height: 90vh;
+  width: 100%;
+  /* Add blur */
+  filter: blur(8px); /* Adjust px for intensity */
+  opacity: 0.6;
+}
+
+.homecontents{
+  position:relative;
+  z-index: 20;
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 10px;
+  margin: 20px;
+}
+
+.hometable{
+  padding-top: 20px;
+  
+  z-index: 30;
+  position: relative;
+  background-color: #ffffff;
+}
+
+

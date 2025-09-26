@@ -1,10 +1,7 @@
-// src/components/AdminBookings.jsx
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
-import { UserContext } from "../context/UserContext";
 
 const AdminBookings = () => {
-  const { currentUser } = useContext(UserContext);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,9 +9,9 @@ const AdminBookings = () => {
     const fetchBookings = async () => {
       try {
         const res = await axiosInstance.get("/admin/bookings");
-        setBookings(res.data.bookings);
+        setBookings(res.data.bookings || []);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching bookings:", err);
       } finally {
         setLoading(false);
       }
@@ -27,7 +24,7 @@ const AdminBookings = () => {
       await axiosInstance.patch(`/admin/bookings/${bookingId}`, { status });
       setBookings(bookings.map(b => (b._id === bookingId ? { ...b, status } : b)));
     } catch (err) {
-      console.error(err);
+      console.error("Error updating status:", err);
     }
   };
 
@@ -36,16 +33,18 @@ const AdminBookings = () => {
       await axiosInstance.delete(`/admin/bookings/${bookingId}`);
       setBookings(bookings.filter(b => b._id !== bookingId));
     } catch (err) {
-      console.error(err);
+      console.error("Error cancelling booking:", err);
     }
   };
 
   if (loading) return <p>Loading bookings...</p>;
 
   return (
-    <div>
+    <div className="admin-bookings-container">
       <h3>All Bookings</h3>
-      {bookings.length === 0 ? <p>No bookings found.</p> : (
+      {bookings.length === 0 ? (
+        <p>No bookings found.</p>
+      ) : (
         <table>
           <thead>
             <tr>
@@ -53,16 +52,42 @@ const AdminBookings = () => {
               <th>User/Guest</th>
               <th>Date</th>
               <th>Status</th>
+              <th>Payment Slip</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {bookings.map(b => (
               <tr key={b._id}>
-                <td>{b.slot?.slotNumber}</td>
-                <td>{b.customer?.username || b.guestName || "Guest"}</td>
+                <td>{b.slot?.slotNumber || "N/A"}</td>
+                <td>{b.customer?.name || b.guestName || "Guest"}</td>
                 <td>{new Date(b.bookingDate).toLocaleString()}</td>
                 <td>{b.status}</td>
+                <td>
+                  {b.paymentSlip ? (
+                    <>
+                      <a
+                        href={`http://localhost:5000/uploads/payments/${b.paymentSlip}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View Slip
+                      </a>
+                      <img
+                        src={`http://localhost:5000/uploads/payments/${b.paymentSlip}`}
+                        alt="Payment Slip"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                          marginLeft: "10px",
+                        }}
+                      />
+                    </>
+                  ) : (
+                    "No Slip"
+                  )}
+                </td>
                 <td>
                   {b.status !== "approved" && (
                     <button onClick={() => updateStatus(b._id, "approved")}>Approve</button>
