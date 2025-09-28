@@ -1,115 +1,255 @@
-/* Sidebar */
+/* =========================
+   Admin Dashboard Container
+   ========================= */
 .admin-dashboard-container {
   display: flex;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
-  background-color: #f7f7f7;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6fa;
+  transition: all 0.3s ease;
 }
 
+/* =========================
+   Sidebar
+   ========================= */
 .sidebar {
-  width: 220px;
+  width: 240px;
   background-color: #014E9E;
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
+  color: #fff;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
 }
 
 .sidebar h3 {
-  margin-bottom: 20px;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar h3:hover {
+  transform: scale(1.05);
 }
 
 .sidebar h3 a {
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 
 .sidebar ul {
   list-style: none;
   padding-left: 0;
+  flex: 1;
 }
 
 .sidebar ul li {
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+  position: relative;
 }
 
 .sidebar ul li a {
-  color: white;
+  color: #fff;
+  font-weight: 600;
   text-decoration: none;
-  font-weight: bold;
+  display: block;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .sidebar ul li a:hover {
-  text-decoration: underline;
+  background-color: #023e7d;
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* Main content */
+/* Active link animation */
+.sidebar ul li a.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background: #ffd700;
+  border-radius: 0 4px 4px 0;
+  animation: slideIn 0.3s forwards;
+}
+
+@keyframes slideIn {
+  0% { width: 0; }
+  100% { width: 5px; }
+}
+
+/* =========================
+   Main Content
+   ========================= */
 .admin-dashboard-content {
   flex: 1;
-  padding: 20px;
+  padding: 35px;
+  background-color: #f7f9fc;
+  transition: all 0.3s ease;
 }
 
-.admin-dashboard-content h2 {
-  margin-bottom: 20px;
+.dashboard-header {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  animation: fadeIn 0.8s ease;
 }
 
-.admin-dashboard-content h3 {
-  margin-top: 30px;
-  margin-bottom: 10px;
+.dashboard-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 2rem;
+  color: #014E9E;
+  transition: color 0.3s ease;
 }
 
-/* Buttons */
+.dashboard-header h2:hover {
+  color: #023e7d;
+}
+
+.dashboard-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* =========================
+   Buttons
+   ========================= */
 button {
-  padding: 5px 10px;
+  padding: 7px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-  opacity: 0.9;
-}
-
-/* Table for bookings */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-table th,
-table td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: center;
-}
-
-table th {
-  background-color: #014E9E;
-  color: white;
-}
-
-/* Slot management */
-.admin-slot-container {
-  margin-top: 20px;
-}
-
-.add-slot input {
-  padding: 5px;
-  margin-right: 5px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .add-slot button {
   background-color: #014E9E;
-  color: white;
-}
-
-ul li {
-  margin-bottom: 10px;
+  color: #fff;
 }
 
 ul li button {
   margin-left: 10px;
   background-color: #ff4d4d;
   color: white;
+  transition: all 0.3s ease;
+}
+
+ul li button:hover {
+  background-color: #e60000;
+  transform: scale(1.05);
+}
+
+/* =========================
+   Tables
+   ========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  animation: fadeIn 0.8s ease;
+}
+
+table th,
+table td {
+  padding: 14px 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+table th {
+  background-color: #014E9E;
+  color: #fff;
+  font-weight: 600;
+}
+
+table tr:hover td {
+  background-color: #f1f5fb;
+  transform: scale(1.02);
+}
+
+/* =========================
+   Animations
+   ========================= */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   Slot Management & Lists
+   ========================= */
+.admin-slot-container {
+  margin-top: 25px;
+}
+
+.add-slot input {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.add-slot input:focus {
+  border-color: #014E9E;
+  box-shadow: 0 0 8px rgba(1,78,158,0.3);
+}
+
+/* List hover effect */
+ul li {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+ul li:hover {
+  transform: translateX(3px);
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 992px) {
+  .admin-dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 15px;
+  }
+
+  .sidebar h3 {
+    display: none;
+  }
+
+  .admin-dashboard-content {
+    padding: 20px;
+  }
+
+  table th,
+  table td {
+    padding: 10px 8px;
+  }
 }

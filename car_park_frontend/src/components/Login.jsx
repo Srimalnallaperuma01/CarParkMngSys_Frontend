@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
@@ -14,16 +13,19 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const userData = await loginUser(email, password);
 
       if (userData.role === "admin" || userData.role === "superadmin") {
-        navigate("/admin"); // Admins go to admin dashboard
+        navigate("/admin");
+      } else if (userData.role === "user") {
+        navigate("/dashboard/book-slot");
       } else {
-        navigate("/dashboard/book-slot"); // Users go to user dashboard
+        alert("Login failed: Unknown role");
       }
     } catch (err) {
-      alert("Login failed: " + err);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -33,9 +35,23 @@ const Login = () => {
     <div className="login-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );
