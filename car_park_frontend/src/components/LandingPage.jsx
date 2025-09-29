@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useContext } from "react";
+import React, { useRef, useEffect, useState, useContext, useCallback } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
 import "./LandingPage.css";
@@ -17,11 +17,10 @@ const LandingPage = () => {
   const { slotsData, setSlotsData } = useContext(SlotsContext);
   const [loading, setLoading] = useState(true);
 
-  // Scroll handling
-  const scrollToSection = (ref) => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // Scroll to section
+  const scrollToSection = (ref) => ref.current?.scrollIntoView({ behavior: "smooth" });
 
+  // Handle active section on scroll
   const handleScroll = () => {
     const sections = [
       { id: "hero", ref: heroRef },
@@ -47,8 +46,8 @@ const LandingPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fetch slots from backend
-  const fetchSlots = async () => {
+  // Fetch slots
+  const fetchSlots = useCallback(async () => {
     try {
       const res = await axiosInstance.get("/parking");
       if (res.data) setSlotsData(res.data);
@@ -57,14 +56,15 @@ const LandingPage = () => {
       console.error("Error fetching slots:", err);
       setLoading(false);
     }
-  };
+  }, [setSlotsData]);
 
   useEffect(() => {
     fetchSlots();
     const interval = setInterval(fetchSlots, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchSlots]);
 
+  // Function to get color based on status
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "available": return "#28a745";
@@ -80,36 +80,18 @@ const LandingPage = () => {
       <header className="header">
         <div className="logo">Parkly</div>
         <nav className="nav">
-          <button
-            className={`nav-btn ${activeSection === "about" ? "active" : ""}`}
-            onClick={() => scrollToSection(aboutRef)}
-          >
-            About
-          </button>
-          <button
-            className={`nav-btn ${activeSection === "privacy" ? "active" : ""}`}
-            onClick={() => scrollToSection(privacyRef)}
-          >
-            Privacy
-          </button>
-          <button
-            className={`nav-btn ${activeSection === "contact" ? "active" : ""}`}
-            onClick={() => scrollToSection(contactRef)}
-          >
-            Contact
-          </button>
-          <button
-            className={`nav-btn ${activeSection === "slots" ? "active" : ""}`}
-            onClick={() => scrollToSection(slotsRef)}
-          >
-            Availability
-          </button>
-          <button
-            className={`nav-btn ${activeSection === "book" ? "active" : ""}`}
-            onClick={() => scrollToSection(bookRef)}
-          >
-            Book
-          </button>
+          {["about","privacy","contact","slots","book"].map((section) => (
+            <button
+              key={section}
+              className={`nav-btn ${activeSection === section ? "active" : ""}`}
+              onClick={() => {
+                const refMap = { about: aboutRef, privacy: privacyRef, contact: contactRef, slots: slotsRef, book: bookRef };
+                scrollToSection(refMap[section]);
+              }}
+            >
+              {section.charAt(0).toUpperCase() + section.slice(1)}
+            </button>
+          ))}
         </nav>
       </header>
 
@@ -170,32 +152,30 @@ const LandingPage = () => {
         <div className="availability-table-container">
           <h2>Slot Availability</h2>
           {loading ? (
-            <p style={{ color: "#333" }}>Loading slots...</p>
+            <p className="loading-text">Loading slots...</p>
           ) : (
             <table>
               <thead>
                 <tr>
-                  <th>Slot Number</th>
-                  <th>Status</th>
-                  <th>Price (LKR)</th>
+                  <th className="slot-number">Slot Number</th>
+                  <th className="slot-status">Status</th>
+                  <th className="slot-price">Price (LKR)</th>
                 </tr>
               </thead>
               <tbody>
                 {slotsData.map((slot) => (
                   <tr key={slot._id || slot.id}>
-                    <td>{slot.slotNumber || slot.id}</td>
+                    <td className="slot-number">{slot.slotNumber || slot.id}</td>
                     <td
+                      className="slot-status"
                       style={{
                         backgroundColor: getStatusColor(slot.status),
                         color: slot.status.toLowerCase() === "pending" ? "#333" : "#fff",
-                        textAlign: "center",
-                        fontWeight: 600,
-                        borderRadius: "6px",
                       }}
                     >
                       {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
                     </td>
-                    <td>{slot.price ? `LKR ${slot.price}` : "-"}</td>
+                    <td className="slot-price">{slot.price ? `LKR ${slot.price}` : "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -212,7 +192,6 @@ const LandingPage = () => {
         </p>
       </section>
 
-      {/* Scroll to top button */}
       <ScrollTopButton />
     </div>
   );

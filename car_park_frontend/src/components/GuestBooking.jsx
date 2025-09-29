@@ -1,5 +1,4 @@
-// src/components/GuestBooking.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./GuestBooking.css";
@@ -11,21 +10,21 @@ const GuestBooking = () => {
   const [slots, setSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  useEffect(() => {
-    fetchSlots();
-  }, []);
-
-  const fetchSlots = async () => {
+  // Fetch slots function
+  const fetchSlots = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}/parking`);
-      const available = res.data.filter((slot) => slot.status === "Available");
+      const available = res.data.filter((slot) => slot.status.toLowerCase() === "available");
       setSlots(available);
     } catch (err) {
       alert("Error fetching slots: " + (err.response?.data?.message || err.message));
     }
-  };
+  }, [API_URL]);
 
-  // Redirect to register page instead of booking
+  useEffect(() => {
+    fetchSlots();
+  }, [fetchSlots]); // include fetchSlots to satisfy ESLint
+
   const handleBooking = () => {
     if (!selectedSlot) return alert("Please select a slot!");
     navigate("/register");
@@ -35,7 +34,6 @@ const GuestBooking = () => {
     <div className="guest-booking-container">
       <h2>Guest Booking</h2>
 
-      {/* Slot Availability Table */}
       <table className="slots-table">
         <thead>
           <tr>
@@ -49,12 +47,12 @@ const GuestBooking = () => {
           {slots.length > 0 ? (
             slots.map((slot) => (
               <tr
-                key={slot._id}
+                key={slot._id || slot.id}
                 className={selectedSlot?.slotNumber === slot.slotNumber ? "selected-row" : ""}
               >
-                <td>{slot.slotNumber}</td>
-                <td className="status available">{slot.status}</td>
-                <td>{slot.price || "-"}</td>
+                <td>{slot.slotNumber || slot.id}</td>
+                <td className={`status ${slot.status.toLowerCase()}`}>{slot.status}</td>
+                <td>{slot.price ? `LKR ${slot.price}` : "-"}</td>
                 <td>
                   <button
                     className="select-btn"
@@ -75,7 +73,6 @@ const GuestBooking = () => {
         </tbody>
       </table>
 
-      {/* Redirect to Register */}
       {selectedSlot && (
         <div className="guest-form">
           <h3>Enter Details</h3>

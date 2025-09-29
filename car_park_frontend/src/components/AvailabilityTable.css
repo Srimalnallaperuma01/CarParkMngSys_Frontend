@@ -3,7 +3,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 30px 20px;
-  background-color: #f0f8ff; /* light blue matching landing page */
+  background-color: #f0f8ff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
   font-family: "Poppins", sans-serif;
@@ -16,26 +16,51 @@
   font-size: 2rem;
 }
 
+/* Table styling */
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th, td {
   padding: 12px 15px;
   border-bottom: 1px solid #ddd;
+  word-wrap: break-word;
 }
 
+/* Header */
 th {
   background-color: #1E90FF;
   color: white;
   font-weight: 600;
+  font-size: 1rem;
 }
 
+/* Body cells */
 td {
   border-radius: 6px;
+  font-size: 0.95rem;
+  color: #333;
 }
 
+/* Align columns */
+td.slot-id, th.slot-id { text-align: center; }
+td.status, th.status { text-align: center; font-weight: 600; }
+td.price, th.price { text-align: right; font-weight: 500; color: #1E90FF; }
+
+/* Hover effect */
 tr:hover td {
   background-color: rgba(30, 144, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  th, td {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+  td.price, th.price {
+    text-align: center; /* center price on small screens */
+  }
 }

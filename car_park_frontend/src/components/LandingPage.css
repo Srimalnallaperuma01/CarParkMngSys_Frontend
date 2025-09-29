@@ -96,7 +96,6 @@
   color: #1E90FF;
   font-size: 3rem;
   margin-bottom: 20px;
-  border-radius: 10px;
 }
 
 .hero-left p {
@@ -207,7 +206,6 @@
   background-color: #f0f8ff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  font-family: "Poppins", sans-serif;
   text-align: center;
 }
 
@@ -220,39 +218,31 @@
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto; /* let columns adjust to content */
 }
 
 th, td {
-  padding: 12px 15px;
+  padding: 12px 10px;
+  text-align: center; /* center all columns by default */
+  vertical-align: middle;
   border-bottom: 1px solid #ddd;
 }
 
-th {
-  background-color: #1E90FF;
-  color: white;
-  font-weight: 600;
-}
+th.slot-number, td.slot-number { text-align: left; text-align: left; }
+th.slot-status, td.slot-status {text-align: center ;text-align: center }
+th.slot-price, td.slot-price { text-align: right; text-align: right; }
 
-td {
-  border-radius: 6px;
-}
 
-tr:hover td {
-  background-color: rgba(30, 144, 255, 0.1);
-}
+/* Status classes */
+td.slot-status.available { background-color: #28a745; color: #fff; }
+td.slot-status.booked { background-color: #dc3545; color: #fff; }
+td.slot-status.pending { background-color: #FFC107; color: #333; }
+td.slot-status.unknown { background-color: #6c757d; color: #fff; }
 
-/* =========================
-   Responsive
-   ========================= */
-@media (max-width: 992px) {
-  .hero-content {
-    flex-direction: column;
-    text-align: center;
-  }
+tr:hover td { background-color: rgba(30, 144, 255, 0.1); }
 
-  .hero-left { padding-right: 0; margin-bottom: 20px; }
-  .hero-right { text-align: center; }
-
-  .section p { font-size: 1rem; max-width: 100%; }
-  .availability-table-container { padding: 20px; }
+/* Responsive */
+@media (max-width: 768px) {
+  .availability-table-container { padding: 15px; }
+  table, th, td { font-size: 0.9rem; }
 }
