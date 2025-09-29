@@ -4,8 +4,8 @@
 .admin-dashboard-container {
   display: flex;
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f6fa;
+  font-family: 'Poppins', sans-serif;
+  background-color: #e6f0ff;
   transition: all 0.3s ease;
 }
 
@@ -13,19 +13,23 @@
    Sidebar
    ========================= */
 .sidebar {
-  width: 240px;
-  background-color: #014E9E;
+  width: 250px;
+  background-color: #1E90FF; /* Primary blue */
   color: #fff;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  border-radius: 0 20px 20px 0;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
 }
 
 .sidebar h3 {
-  font-size: 1.8rem;
-  margin-bottom: 25px;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
   transition: transform 0.3s ease;
 }
 
@@ -47,6 +51,7 @@
 .sidebar ul li {
   margin-bottom: 18px;
   position: relative;
+  border-radius: 12px;
 }
 
 .sidebar ul li a {
@@ -54,33 +59,32 @@
   font-weight: 600;
   text-decoration: none;
   display: block;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .sidebar ul li a:hover {
   background-color: #023e7d;
   transform: translateX(5px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
-/* Active link animation */
 .sidebar ul li a.active::before {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
-  width: 5px;
+  width: 6px;
   height: 100%;
-  background: #ffd700;
+  background: #ffc107; /* Secondary yellow */
   border-radius: 0 4px 4px 0;
   animation: slideIn 0.3s forwards;
 }
 
 @keyframes slideIn {
   0% { width: 0; }
-  100% { width: 5px; }
+  100% { width: 6px; }
 }
 
 /* =========================
@@ -88,22 +92,23 @@
    ========================= */
 .admin-dashboard-content {
   flex: 1;
-  padding: 35px;
-  background-color: #f7f9fc;
+  padding: 40px;
+  background-color: #f0f8ff;
   transition: all 0.3s ease;
 }
 
 .dashboard-header {
-  margin-bottom: 30px;
+  margin-bottom: 35px;
   padding-bottom: 15px;
   border-bottom: 1px solid #ddd;
   animation: fadeIn 0.8s ease;
 }
 
 .dashboard-header h2 {
-  margin: 0 0 5px 0;
-  font-size: 2rem;
-  color: #014E9E;
+  margin: 0 0 8px 0;
+  font-size: 2.2rem;
+  color: #1E90FF;
+  font-weight: 700;
   transition: color 0.3s ease;
 }
 
@@ -113,7 +118,7 @@
 
 .dashboard-header p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #555;
 }
 
@@ -121,28 +126,29 @@
    Buttons
    ========================= */
 button {
-  padding: 7px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
 .add-slot button {
-  background-color: #014E9E;
+  background-color: #1E90FF;
   color: #fff;
 }
 
 ul li button {
   margin-left: 10px;
   background-color: #ff4d4d;
-  color: white;
+  color: #fff;
   transition: all 0.3s ease;
 }
 
@@ -152,69 +158,79 @@ ul li button:hover {
 }
 
 /* =========================
-   Tables
+   Tables / Cards
    ========================= */
 table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 25px;
   background-color: #fff;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   animation: fadeIn 0.8s ease;
 }
 
 table th,
 table td {
-  padding: 14px 12px;
+  padding: 16px 14px;
   text-align: center;
   border-bottom: 1px solid #eee;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 table th {
-  background-color: #014E9E;
+  background-color: #1E90FF;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 table tr:hover td {
   background-color: #f1f5fb;
   transform: scale(1.02);
+  border-radius: 12px;
+}
+
+/* Card style for rows */
+table tbody tr {
+  border-radius: 12px;
+  margin-bottom: 10px;
+  display: block;
 }
 
 /* =========================
    Animations
    ========================= */
 @keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(10px); }
+  0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================
-   Slot Management & Lists
+   Slot Management Inputs
    ========================= */
 .admin-slot-container {
   margin-top: 25px;
 }
 
 .add-slot input {
-  padding: 8px 12px;
-  margin-right: 8px;
+  padding: 10px 14px;
+  margin-right: 10px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .add-slot input:focus {
-  border-color: #014E9E;
-  box-shadow: 0 0 8px rgba(1,78,158,0.3);
+  border-color: #1E90FF;
+  box-shadow: 0 0 10px rgba(30,144,255,0.3);
 }
 
 /* List hover effect */
 ul li {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -238,6 +254,7 @@ ul li:hover {
     flex-direction: row;
     justify-content: space-around;
     padding: 15px;
+    border-radius: 0;
   }
 
   .sidebar h3 {
@@ -245,11 +262,11 @@ ul li:hover {
   }
 
   .admin-dashboard-content {
-    padding: 20px;
+    padding: 25px;
   }
 
   table th,
   table td {
-    padding: 10px 8px;
+    padding: 12px 8px;
   }
 }

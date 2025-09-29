@@ -1,0 +1,19 @@
+.page-container {
+  background: #1E90FF;
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 80vh;
+}
+
+.page-container h1 {
+  font-size: 36px;
+  margin-bottom: 30px;
+}
+
+.page-container p {
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 15px;
+}

@@ -1,13 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
+import "./CheckAvailability.css";
 
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
-    case "available": return "green";
-    case "booked": return "red";
-    case "pending": return "yellow";
-    default: return "grey";
+    case "available":
+      return "#28a745"; // Green
+    case "booked":
+      return "#dc3545"; // Red
+    case "pending":
+      return "#FFC107"; // Yellow
+    default:
+      return "#6c757d"; // Grey
   }
 };
 
@@ -17,57 +22,53 @@ const CheckAvailability = () => {
 
   const fetchSlots = async () => {
     try {
-      // Fetch from backend
-      const res = await axiosInstance.get("/parking"); // make sure this matches your backend route
+      const res = await axiosInstance.get("/parking"); // backend route
       if (res.data) setSlotsData(res.data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching slots:", err);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSlots(); // initial fetch
+    fetchSlots();
 
-    // Poll every 3 seconds
-    const interval = setInterval(() => {
-      fetchSlots();
-    }, 3000);
-
+    // Polling every 3 seconds
+    const interval = setInterval(() => fetchSlots(), 3000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <p>Loading slots...</p>;
+  if (loading)
+    return (
+      <div className="availability-container">
+        <p className="loading-text">Loading slots...</p>
+      </div>
+    );
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="availability-container">
       <h2>Check Slot Availability</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>Slot ID</th>
-            <th>Status</th>
-            <th>Price (LKR)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {slotsData.map((slot) => (
-            <tr key={slot._id || slot.id}>
-              <td>{slot.slotNumber || slot.id}</td>
-              <td
-                style={{
-                  backgroundColor: getStatusColor(slot.status),
-                  color: slot.status.toLowerCase() === "pending" ? "black" : "white",
-                  textAlign: "center",
-                }}
-              >
-                {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
-              </td>
-              <td>{slot.price || "-"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="slots-card-grid">
+        {slotsData.map((slot) => (
+          <div
+            key={slot._id || slot.id}
+            className="slot-card"
+            style={{ backgroundColor: getStatusColor(slot.status) }}
+          >
+            <span className="slot-number">{slot.slotNumber || slot.id}</span>
+            <span
+              className="slot-status"
+              style={{
+                color: slot.status.toLowerCase() === "pending" ? "#333" : "#fff",
+              }}
+            >
+              {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
+            </span>
+            <span className="slot-price">{slot.price ? `LKR ${slot.price}` : "-"}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

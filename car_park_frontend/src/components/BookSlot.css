@@ -1,56 +1,89 @@
-.book-slot-container {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  font-family: Arial, sans-serif;
-}
-
-.slots-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin: 20px 0;
+/* =========================
+   Slot Cards Preview
+   ========================= */
+.slots-preview {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  justify-content: center;
 }
 
 .slot-card {
-  padding: 15px;
-  border-radius: 8px;
+  flex: 1 1 140px;
+  min-width: 120px;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: 700;
   cursor: pointer;
-  color: white;
-  font-weight: bold;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  background: #fff; /* White background to contrast with blue page */
+  color: #1E90FF; /* Primary blue text */
+  border: 3px solid #1E90FF; /* Blue border for visibility */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  animation: fadeInUp 0.6s ease forwards;
 }
 
+.slot-card span {
+  display: block;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+/* Slot status colors */
 .slot-card.available {
-  background-color: #4caf50;
+  background: #1E90FF; /* Blue */
+  color: #fff;
+  border: 3px solid #1E90FF;
 }
 
 .slot-card.booked {
-  background-color: #f44336;
-  cursor: not-allowed;
+  background: #dc3545; /* Red */
+  color: #fff;
+  border: 3px solid #dc3545;
 }
 
+.slot-card.pending {
+  background: #FFC107; /* Yellow */
+  color: #333;
+  border: 3px solid #FFC107;
+}
+
+/* Selected slot highlight */
 .slot-card.selected {
-  border: 3px solid #ffd700;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px #ffd700;
+  border: 3px solid #FFD700; /* Gold border for selection */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
 
-.book-button {
-  padding: 10px 20px;
-  background-color: #014E9E;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-bottom: 20px;
+/* Hover effect */
+.slot-card:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
 }
 
-.book-button:disabled {
-  background-color: gray;
-  cursor: not-allowed;
+/* =========================
+   Animations
+   ========================= */
+@keyframes fadeInUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
-.booking-confirmation {
-  margin-top: 20px;
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 992px) {
+  .slots-preview {
+    justify-content: center;
+  }
+
+  .slot-card {
+    flex: 1 1 120px;
+    padding: 15px;
+    font-size: 0.95rem;
+  }
 }

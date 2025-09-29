@@ -1,127 +1,219 @@
-import React, { useState, useEffect, useContext, useRef } from "react"; 
-import { Link } from "react-router-dom";
-import "./LandingPage.css";
-import pimg from "../images/pimg.jpg";
-import bg1 from "../images/bg1.jpg";
+import React, { useRef, useEffect, useState, useContext } from "react";
+import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
-
-const getStatusColor = (status) => {
-  if (!status) return "gray";
-  status = status.toLowerCase();
-  if (status === "available") return "#28a745";
-  if (status === "booked") return "#dc3545";
-  if (status === "pending") return "#ffc107";
-};
+import "./LandingPage.css";
+import heroImg from "../images/hero.jpg";
+import ScrollTopButton from "./ScrollTopButton";
 
 const LandingPage = () => {
-  const [showSlots, setShowSlots] = useState(false);
-  const { slotsData, fetchSlots } = useContext(SlotsContext);
-  const slotsRef = useRef(null); // ref for slots section
+  const aboutRef = useRef(null);
+  const privacyRef = useRef(null);
+  const contactRef = useRef(null);
+  const slotsRef = useRef(null);
+  const bookRef = useRef(null);
+  const heroRef = useRef(null);
+
+  const [activeSection, setActiveSection] = useState("");
+  const { slotsData, setSlotsData } = useContext(SlotsContext);
+  const [loading, setLoading] = useState(true);
+
+  // Scroll handling
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleScroll = () => {
+    const sections = [
+      { id: "hero", ref: heroRef },
+      { id: "about", ref: aboutRef },
+      { id: "privacy", ref: privacyRef },
+      { id: "contact", ref: contactRef },
+      { id: "slots", ref: slotsRef },
+      { id: "book", ref: bookRef },
+    ];
+    const scrollPosition = window.scrollY + window.innerHeight / 2;
+    sections.forEach((section) => {
+      if (
+        section.ref.current.offsetTop <= scrollPosition &&
+        section.ref.current.offsetTop + section.ref.current.offsetHeight > scrollPosition
+      ) {
+        setActiveSection(section.id);
+      }
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fetch slots from backend
+  const fetchSlots = async () => {
+    try {
+      const res = await axiosInstance.get("/parking");
+      if (res.data) setSlotsData(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching slots:", err);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchSlots();
+    const interval = setInterval(fetchSlots, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleCheckAvailability = () => {
-    const newShow = !showSlots;
-    setShowSlots(newShow);
-
-    // Scroll to table when showing it
-    if (!showSlots) {
-      setTimeout(() => {
-        slotsRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case "available": return "#28a745";
+      case "booked": return "#dc3545";
+      case "pending": return "#FFC107";
+      default: return "#6c757d";
     }
   };
 
   return (
     <div className="landing-container">
-
       {/* Header */}
-      <header className="landing-header">
-        <div className="header-left">
-          <h1>Car Park Management System</h1>
-          <h5>Easy Parking with QR Code</h5>
-        </div>
-        <div className="auth-buttons">
-          <Link to="/login" className="btn login-btn">Login</Link>
-          <Link to="/register" className="btn register-btn">Register</Link>
-        </div>
+      <header className="header">
+        <div className="logo">Parkly</div>
+        <nav className="nav">
+          <button
+            className={`nav-btn ${activeSection === "about" ? "active" : ""}`}
+            onClick={() => scrollToSection(aboutRef)}
+          >
+            About
+          </button>
+          <button
+            className={`nav-btn ${activeSection === "privacy" ? "active" : ""}`}
+            onClick={() => scrollToSection(privacyRef)}
+          >
+            Privacy
+          </button>
+          <button
+            className={`nav-btn ${activeSection === "contact" ? "active" : ""}`}
+            onClick={() => scrollToSection(contactRef)}
+          >
+            Contact
+          </button>
+          <button
+            className={`nav-btn ${activeSection === "slots" ? "active" : ""}`}
+            onClick={() => scrollToSection(slotsRef)}
+          >
+            Availability
+          </button>
+          <button
+            className={`nav-btn ${activeSection === "book" ? "active" : ""}`}
+            onClick={() => scrollToSection(bookRef)}
+          >
+            Book
+          </button>
+        </nav>
       </header>
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <img src={bg1} alt="Background" className="bg-img" />
-
-        <div className="hero-overlay">
-          <div className="hero-content">
-
-            <div className="quick-info-section">
-              <h3>Quick Info</h3>
-              <ul>
-                <li>Parking Fees: LKR 200–500 per hour depending on slot type</li>
-                <li>Slot Status: Real-time availability with booking option</li>
-                <li>Rules: Safe parking, valid vehicle ID required, no overnight parking without approval</li>
-                <li>Payment: Upload payment slip and receive confirmation & QR code</li>
-              </ul>
-              
-              <div className="cta-buttons">
-                <Link to="/login" className="btn btn-light-blue">Book a Slot</Link>
-                <button className="btn" onClick={handleCheckAvailability}>
-                  {showSlots ? "Hide Availability" : "Check Availability"}
-                </button>
-                <Link to="/guest" className="btn btn-light-blue">Continue as Guest</Link>
-              </div>
-
+      <section ref={heroRef} className="section hero-section">
+        <div className="hero-content">
+          <div className="hero-left">
+            <h1 className="animate-slide-left">Welcome to Parkly</h1>
+            <p className="animate-fade-in">
+              Effortless parking with real-time availability, QR code verification, and online booking.
+            </p>
+            <div className="hero-buttons">
+              <a href="/login" className="btn-flat btn-blue animate-pop">Login</a>
+              <a href="/register" className="btn-flat btn-yellow animate-pop">Register</a>
+              <button
+                className="btn-flat btn-light-blue animate-pop"
+                onClick={() => scrollToSection(slotsRef)}
+              >
+                Check Availability
+              </button>
             </div>
-
-            <div className="hero-image-section">
-              <img src={pimg} alt="Car Parking Illustration" className="hero-img" />
-              <h2>Easy Parking with QR Code</h2>
-            </div>
-
+          </div>
+          <div className="hero-right animate-slide-right">
+            <img src={heroImg} alt="Car Parking" className="hero-img" />
           </div>
         </div>
       </section>
 
-      {/* Slot Table */}
-      {showSlots && (
-        <section className="slots-table" ref={slotsRef}>
-          <h3>Slot Availability</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Slot ID</th>
-                <th>Status</th>
-                <th>Price (LKR)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {slotsData.length > 0 ? (
-                slotsData.map((slot) => (
-                  <tr key={slot._id} className="slot-row">
-                    <td>{slot.slotNumber}</td>
-                    <td style={{
-                      backgroundColor: getStatusColor(slot.status),
-                      color: slot.status === "pending" ? "black" : "white",
-                      textAlign: "center",
-                      borderRadius: "6px",
-                      padding: "5px 0"
-                    }}>
+      {/* About Section */}
+      <section ref={aboutRef} className="section about-section full-screen-section animate-fade-up">
+        <h2>About Parkly</h2>
+        <p>
+          Parkly is a modern car park management system that saves your time and stress. Real-time slot availability,
+          easy booking, and QR code verification make parking seamless. Designed for both users and admins to
+          manage parking efficiently.
+        </p>
+      </section>
+
+      {/* Privacy Section */}
+      <section ref={privacyRef} className="section privacy-section full-screen-section animate-fade-up">
+        <h2>Privacy & Policy</h2>
+        <p>
+          Parkly prioritizes user privacy. All personal and vehicle information is securely stored. Payment details
+          and bookings are confidential and only used for park management and verification purposes.
+        </p>
+      </section>
+
+      {/* Contact Section */}
+      <section ref={contactRef} className="section contact-section full-screen-section animate-fade-up">
+        <h2>Contact Us</h2>
+        <p>Email: support@parkly.com</p>
+        <p>Phone: +94 77 123 4567</p>
+        <p>Address: 123 Parkly Street, Colombo, Sri Lanka</p>
+      </section>
+
+      {/* Availability Section */}
+      <section ref={slotsRef} className="section availability-section full-screen-section animate-fade-up">
+        <div className="availability-table-container">
+          <h2>Slot Availability</h2>
+          {loading ? (
+            <p style={{ color: "#333" }}>Loading slots...</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Slot Number</th>
+                  <th>Status</th>
+                  <th>Price (LKR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {slotsData.map((slot) => (
+                  <tr key={slot._id || slot.id}>
+                    <td>{slot.slotNumber || slot.id}</td>
+                    <td
+                      style={{
+                        backgroundColor: getStatusColor(slot.status),
+                        color: slot.status.toLowerCase() === "pending" ? "#333" : "#fff",
+                        textAlign: "center",
+                        fontWeight: 600,
+                        borderRadius: "6px",
+                      }}
+                    >
                       {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
                     </td>
-                    <td>{slot.price || "-"}</td>
+                    <td>{slot.price ? `LKR ${slot.price}` : "-"}</td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" style={{ textAlign: "center" }}>Loading slots...</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
-      )}
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </section>
+
+      {/* Book Slot Section */}
+      <section ref={bookRef} className="section book-section full-screen-section animate-fade-up">
+        <h2>Book a Slot</h2>
+        <p>
+          Login or register to reserve your preferred parking slot instantly. Parkly makes your parking hassle-free and secure.
+        </p>
+      </section>
+
+      {/* Scroll to top button */}
+      <ScrollTopButton />
     </div>
   );
 };

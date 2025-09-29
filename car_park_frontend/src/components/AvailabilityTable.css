@@ -1,0 +1,41 @@
+.availability-table-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background-color: #f0f8ff; /* light blue matching landing page */
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+}
+
+.availability-table-container h2 {
+  color: #1E90FF;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #1E90FF;
+  color: white;
+  font-weight: 600;
+}
+
+td {
+  border-radius: 6px;
+}
+
+tr:hover td {
+  background-color: rgba(30, 144, 255, 0.1);
+}

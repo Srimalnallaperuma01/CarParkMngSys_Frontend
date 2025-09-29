@@ -2,17 +2,23 @@ import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { UserContext } from "./context/UserContext";
 
+// Public Pages
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import GuestBooking from "./components/GuestBooking";
+import About from "./components/AboutUs";
+import Privacy from "./components/PrivacyPolicy";
+import Contact from "./components/ContactUs";
 
+// User Dashboard Pages
 import Dashboard from "./components/Dashboard";
 import BookSlot from "./components/BookSlot";
 import MyBookings from "./components/MyBookings";
 import Payments from "./components/Payments";
 import Notifications from "./components/Notifications";
 
+// Admin Dashboard Pages
 import AdminDashboard from "./components/AdminDashboard";
 import UsersAdminList from "./components/UsersAdminList";
 import AdminSlotManagement from "./components/AdminSlotManagement";
@@ -23,11 +29,19 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public */}
+      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/guest" element={<GuestBooking />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/contact" element={<Contact />} />
+      {/* Public Book Slot: redirect to login if not logged in */}
+      <Route
+        path="/book"
+        element={currentUser ? <BookSlot /> : <Navigate to="/login" />}
+      />
 
       {/* User Dashboard */}
       <Route
@@ -56,7 +70,7 @@ export default function App() {
         <Route path="bookings" element={<AdminBookings />} />
       </Route>
 
-      {/* Catch-all */}
+      {/* Catch-all: redirect unknown paths to landing page */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
