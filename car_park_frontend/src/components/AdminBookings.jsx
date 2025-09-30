@@ -1,6 +1,25 @@
+// src/components/AdminBookings.jsx
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import "./AdminBooking.css";
+
+const normalizeStatus = (status) => {
+  if (!status) return "pending";
+  const s = status.toLowerCase();
+  if (s === "pending") return "pending";
+  if (s === "approved") return "approved";
+  if (s === "cancelled" || s === "rejected") return "cancelled";
+  return "unknown";
+};
+
+const getStatusColor = (status) => {
+  switch (normalizeStatus(status)) {
+    case "pending": return "#FFC107";   // orange
+    case "approved": return "#dc3545";  // red
+    case "cancelled": return "#6c757d"; // grey
+    default: return "#6c757d";
+  }
+};
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -9,7 +28,6 @@ const AdminBookings = () => {
   const fetchBookings = async () => {
     try {
       const res = await axiosInstance.get("/admin/bookings");
-      // normalize response
       const data = Array.isArray(res.data) ? res.data : res.data.bookings || [];
       setBookings(data);
     } catch (err) {
@@ -26,7 +44,9 @@ const AdminBookings = () => {
   const updateStatus = async (id, status) => {
     try {
       const res = await axiosInstance.patch(`/admin/bookings/${id}`, { status });
-      setBookings(prev => prev.map(b => (b._id === id ? { ...b, status: res.data.booking?.status || status } : b)));
+      setBookings(prev =>
+        prev.map(b => b._id === id ? { ...b, status: res.data.booking?.status || status } : b)
+      );
     } catch (err) {
       console.error(err.response?.data?.message || err.message);
     }
@@ -50,7 +70,7 @@ const AdminBookings = () => {
         <p>No bookings found.</p>
       ) : (
         <table>
-          <thead>
+          
             <tr>
               <th>Slot</th>
               <th>User/Guest</th>
@@ -60,14 +80,15 @@ const AdminBookings = () => {
               <th>QR Code</th>
               <th>Actions</th>
             </tr>
-          </thead>
-          <tbody>
+          
             {bookings.map(b => (
               <tr key={b._id}>
-                <td>{b.slot?.name || b.slot?.slotNumber || "N/A"}</td>
-                <td>{b.customer?.username || b.customer?.name || b.guestName || "Guest"}</td>
+                <td>{b.slot?.slotNumber || "N/A"}</td>
+                <td>{b.customer?.name || b.customer?.username || b.guestName || "Guest"}</td>
                 <td>{b.bookingDate ? new Date(b.bookingDate).toLocaleString() : "N/A"}</td>
-                <td>{b.status || "Pending"}</td>
+                <td style={{ color: getStatusColor(b.status) }}>
+                  {normalizeStatus(b.status).charAt(0).toUpperCase() + normalizeStatus(b.status).slice(1)}
+                </td>
                 <td>
                   {b.paymentSlip ? (
                     <a
@@ -83,14 +104,17 @@ const AdminBookings = () => {
                   {b.qrCode ? <img src={b.qrCode} alt="QR" style={{ width: 50, height: 50 }} /> : "N/A"}
                 </td>
                 <td>
-                  {b.status !== "approved" && (
-                    <button onClick={() => updateStatus(b._id, "approved")}>Approve</button>
+                  {normalizeStatus(b.status) === "pending" && (
+                    <>
+                      <button onClick={() => updateStatus(b._id, "approved")}>Approve</button>
+                      <button onClick={() => updateStatus(b._id, "cancelled")}>Reject</button>
+                    </>
                   )}
-                  <button onClick={() => cancelBooking(b._id)}>Cancel</button>
+                  <button onClick={() => cancelBooking(b._id)} style={{ marginLeft: "5px" }}>Cancel</button>
                 </td>
               </tr>
             ))}
-          </tbody>
+          
         </table>
       )}
     </div>

@@ -29,6 +29,20 @@ const UsersAdminList = () => {
     fetchUsers();
   }, []);
 
+  // Delete user
+  const handleDelete = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await axios.delete(`/admin/users/${userId}`);
+      // Remove deleted user from state
+      setUsers(users.filter((u) => u._id !== userId));
+      alert("User deleted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete user.");
+    }
+  };
+
   // Filter users/admins by Name or NIC safely
   const filteredUsers = users.filter((user) => {
     const name = (user.username || user.name || "").toLowerCase();
@@ -54,7 +68,7 @@ const UsersAdminList = () => {
       </div>
 
       <table className="users-table">
-        <thead>
+        
           <tr>
             <th>Name</th>
             <th>NIC</th>
@@ -63,12 +77,13 @@ const UsersAdminList = () => {
             <th>Vehicle</th>
             <th>Booked Slots</th>
             <th>QR Code</th>
+            <th>Actions</th>
           </tr>
-        </thead>
-        <tbody>
+        
+        
           {filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="7">No users found.</td>
+              <td colSpan="8">No users found.</td>
             </tr>
           ) : (
             filteredUsers.map((user) => (
@@ -96,10 +111,18 @@ const UsersAdminList = () => {
                 <td>
                   <QRCode value={user.qrCode || user._id || ""} size={64} />
                 </td>
+                <td>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(user._id)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))
           )}
-        </tbody>
+        
       </table>
     </div>
   );

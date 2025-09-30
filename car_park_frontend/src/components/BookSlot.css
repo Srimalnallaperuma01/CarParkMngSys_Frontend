@@ -1,89 +1,89 @@
-/* =========================
-   Slot Cards Preview
-   ========================= */
-.slots-preview {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-  justify-content: center;
+.book-slot-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
+}
+
+.book-slot-container h2 {
+  text-align: center;
+  color: #1E90FF;
+  margin-bottom: 20px;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .slot-card {
-  flex: 1 1 140px;
-  min-width: 120px;
-  padding: 20px;
-  border-radius: 16px;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  padding: 15px;
   text-align: center;
-  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-  background: #fff; /* White background to contrast with blue page */
-  color: #1E90FF; /* Primary blue text */
-  border: 3px solid #1E90FF; /* Blue border for visibility */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  animation: fadeInUp 0.6s ease forwards;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.slot-card span {
-  display: block;
-  font-size: 1.3rem;
-  margin-bottom: 8px;
-}
-
-/* Slot status colors */
-.slot-card.available {
-  background: #1E90FF; /* Blue */
-  color: #fff;
-  border: 3px solid #1E90FF;
-}
-
-.slot-card.booked {
-  background: #dc3545; /* Red */
-  color: #fff;
-  border: 3px solid #dc3545;
-}
-
-.slot-card.pending {
-  background: #FFC107; /* Yellow */
-  color: #333;
-  border: 3px solid #FFC107;
-}
-
-/* Selected slot highlight */
-.slot-card.selected {
-  border: 3px solid #FFD700; /* Gold border for selection */
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-}
-
-/* Hover effect */
 .slot-card:hover {
-  transform: translateY(-6px) scale(1.05);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
 }
 
-/* =========================
-   Animations
-   ========================= */
-@keyframes fadeInUp {
-  0% { transform: translateY(20px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+.slot-card.selected {
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6);
+  border-color: #1E90FF;
+  transform: translateY(-3px);
 }
 
-/* =========================
-   Responsive
-   ========================= */
-@media (max-width: 992px) {
-  .slots-preview {
-    justify-content: center;
-  }
+.slot-number {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
 
-  .slot-card {
-    flex: 1 1 120px;
-    padding: 15px;
-    font-size: 0.95rem;
-  }
+.slot-status {
+  font-weight: 600;
+}
+
+.payment-slip-input {
+  display: block;
+  margin: 10px auto 15px auto;
+}
+
+.book-button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  background: #1E90FF;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.book-button:disabled {
+  background: #a0cfff;
+  cursor: not-allowed;
+}
+
+.book-button:hover:not(:disabled) {
+  background: #0052cc;
+}
+
+.booking-confirmation {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  text-align: center;
 }

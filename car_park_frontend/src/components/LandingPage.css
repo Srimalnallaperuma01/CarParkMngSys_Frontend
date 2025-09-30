@@ -250,49 +250,81 @@
 
 .scroll-top-btn.show { display: block; }
 
-/* =========================
-   Availability Table
-   ========================= */
-.availability-table-container {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 30px 20px;
-  background-color: #f0f8ff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  text-align: center;
-}
 
-.availability-table-container h2 {
-  color: #1E90FF;
-  margin-bottom: 20px;
-  font-size: 2rem;
-}
 
-table {
+
+/* LandingPage.css - Slot Availability Table */
+.availability-table-container table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
+  table-layout: fixed; /* Important: keeps columns aligned */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-th, td {
-  padding: 12px 10px;
-  text-align: center;
-  vertical-align: middle;
-  border-bottom: 1px solid #ddd;
+.availability-table-container th,
+.availability-table-container td {
+  border: 1px solid #ccc;
+  padding: 12px 15px;
+  text-align: center; /* Align data to center */
+  word-wrap: break-word;
 }
 
-th.slot-number, td.slot-number { text-align: left; }
-th.slot-status, td.slot-status { text-align: center; }
-th.slot-price, td.slot-price { text-align: right; }
+.availability-table-container th {
+  background-color: #014e9e;
+  color: #fff;
+  font-weight: 600;
+}
 
-td.slot-status.available { background-color: #28a745; color: #fff; }
-td.slot-status.booked { background-color: #dc3545; color: #fff; }
-td.slot-status.pending { background-color: #FFC107; color: #333; }
-td.slot-status.unknown { background-color: #6c757d; color: #fff; }
+.availability-table-container td.slot-status {
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+}
 
-tr:hover td { background-color: rgba(30, 144, 255, 0.1); }
+.availability-table-container td.slot-price {
+  font-weight: 500;
+}
+
+/* Responsive: show data-label for mobile */
+@media (max-width: 768px) {
+  .availability-table-container table,
+  .availability-table-container thead,
+  .availability-table-container tbody,
+  .availability-table-container th,
+  .availability-table-container td,
+  .availability-table-container tr {
+    display: block;
+    width: 100%;
+  }
+
+  .availability-table-container tr {
+    margin-bottom: 15px;
+  }
+
+  .availability-table-container td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .availability-table-container td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: calc(50% - 30px);
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .availability-table-container th {
+    display: none;
+  }
+}
+
+
+
+
+
 
 /* =========================
    Footer

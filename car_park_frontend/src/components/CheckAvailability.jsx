@@ -1,14 +1,19 @@
+// src/components/CheckAvailability.jsx
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
 import "./CheckAvailability.css";
 
+// Status color mapping
 const getStatusColor = (status) => {
-  switch (status.toLowerCase()) {
-    case "available": return "#28a745"; // Green
-    case "booked": return "#dc3545";    // Red
-    case "pending": return "#FFC107";   // Yellow
-    default: return "#6c757d";          // Grey
+  if (!status) return "#6c757d"; // grey
+  const s = status.toLowerCase();
+  switch (s) {
+    case "available": return "#28a745"; // green
+    case "pending": return "#FFC107";   // yellow
+    case "approved":
+    case "booked": return "#dc3545";    // red
+    default: return "#6c757d";          // grey
   }
 };
 
@@ -19,18 +24,23 @@ const CheckAvailability = () => {
   const fetchSlots = async () => {
     try {
       const res = await axiosInstance.get("/parking");
-      if (res.data) setSlotsData(res.data);
+      if (res.data) {
+        // Normalize status
+        const normalizedSlots = res.data.map(s => ({
+          ...s,
+          status: s.status ? s.status.toLowerCase() : "unknown",
+        }));
+        setSlotsData(normalizedSlots);
+      }
       setLoading(false);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching slots:", err);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSlots();
-    const interval = setInterval(fetchSlots, 3000);
-    return () => clearInterval(interval);
+    fetchSlots(); // fetch only once on mount
   }, []);
 
   if (loading) {
@@ -60,8 +70,9 @@ const CheckAvailability = () => {
                 <td
                   style={{
                     backgroundColor: getStatusColor(slot.status),
-                    color: slot.status.toLowerCase() === "pending" ? "#333" : "#fff",
+                    color: slot.status === "pending" ? "#333" : "#fff",
                     borderRadius: "6px",
+                    textAlign: "center",
                   }}
                 >
                   {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}

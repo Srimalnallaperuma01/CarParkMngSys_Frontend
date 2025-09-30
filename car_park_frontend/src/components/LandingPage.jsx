@@ -170,31 +170,34 @@ const LandingPage = () => {
             <p className="loading-text">Loading slots...</p>
           ) : (
             <table>
-              <thead>
-                <tr>
-                  <th className="slot-number">Slot Number</th>
-                  <th className="slot-status">Status</th>
-                  <th className="slot-price">Price (LKR)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {slotsData.map((slot) => (
-                  <tr key={slot._id || slot.id}>
-                    <td className="slot-number">{slot.slotNumber || slot.id}</td>
-                    <td
-                      className="slot-status"
-                      style={{
-                        backgroundColor: getStatusColor(slot.status),
-                        color: slot.status.toLowerCase() === "pending" ? "#333" : "#fff",
-                      }}
-                    >
-                      {slot.status.charAt(0).toUpperCase() + slot.status.slice(1)}
-                    </td>
-                    <td className="slot-price">{slot.price ? `LKR ${slot.price}` : "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+  
+    <tr>
+      <th className="slot-number">Slot Number</th>
+      <th className="slot-status">Status</th>
+      <th className="slot-price">Price (LKR)</th>
+    </tr>
+  
+  
+    {slotsData.map((slot, index) => (
+      <tr key={slot._id || slot.id || index}>
+        <td data-label="Slot Number" className="slot-number">{slot.slotNumber || slot.id || `S${index + 1}`}</td>
+        <td
+          data-label="Status"
+          className="slot-status"
+          style={{
+            backgroundColor: getStatusColor(slot.status),
+            color: slot.status?.toLowerCase() === "pending" ? "#333" : "#fff",
+          }}
+        >
+          {slot.status ? slot.status.charAt(0).toUpperCase() + slot.status.slice(1) : "Unknown"}
+        </td>
+        <td data-label="Price" className="slot-price">{slot.price ? `LKR ${slot.price}` : "-"}</td>
+      </tr>
+    ))}
+  
+</table>
+
+
           )}
         </div>
       </section>
