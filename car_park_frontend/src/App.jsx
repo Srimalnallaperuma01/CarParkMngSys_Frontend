@@ -28,9 +28,11 @@ import AdminBookings from "./components/AdminBookings";
 export default function App() {
   const { currentUser } = useContext(UserContext);
 
+  // Only redirect unverified users
   const requireUserVerification = (element) => {
     if (!currentUser) return <Navigate to="/login" />;
-    if (currentUser.role === "user" && currentUser.isVerified === false) return <Navigate to="/verify-otp" />;
+    // Only enforce OTP for "user" role
+    if (currentUser.role === "user" && !currentUser.isVerified) return <Navigate to="/verify-otp" />;
     return element;
   };
 
@@ -47,7 +49,14 @@ export default function App() {
       <Route path="/verify-otp" element={<VerifyOtp />} />
 
       {/* User Dashboard */}
-      <Route path="/dashboard/*" element={currentUser?.role === "user" ? requireUserVerification(<Dashboard />) : <Navigate to="/login" />}>
+      <Route
+        path="/dashboard/*"
+        element={
+          currentUser?.role === "user"
+            ? requireUserVerification(<Dashboard />)
+            : <Navigate to="/login" />
+        }
+      >
         <Route path="book-slot" element={<BookSlot />} />
         <Route path="my-bookings" element={<MyBookings />} />
         <Route path="payments" element={<Payments />} />
@@ -55,7 +64,14 @@ export default function App() {
       </Route>
 
       {/* Admin Dashboard (no OTP check) */}
-      <Route path="/admin/*" element={currentUser && (currentUser.role === "admin" || currentUser.role === "superadmin") ? <AdminDashboard /> : <Navigate to="/login" />}>
+      <Route
+        path="/admin/*"
+        element={
+          currentUser && (currentUser.role === "admin" || currentUser.role === "superadmin")
+            ? <AdminDashboard />
+            : <Navigate to="/login" />
+        }
+      >
         <Route path="users" element={<UsersAdminList />} />
         <Route path="slots" element={<AdminSlotManagement />} />
         <Route path="bookings" element={<AdminBookings />} />

@@ -14,7 +14,8 @@ const VerifyOTP = () => {
     if (!currentUser) {
       navigate("/login");
     } else if (currentUser.role !== "user" || currentUser.isVerified) {
-      navigate("/dashboard/book-slot"); // Redirect to user dashboard or admin area
+      // Admins or verified users go to dashboard
+      navigate(currentUser.role === "user" ? "/dashboard/book-slot" : "/admin");
     }
   }, [currentUser, navigate]);
 
@@ -25,7 +26,7 @@ const VerifyOTP = () => {
       const res = await verifyOtp(currentUser.email, otp);
       if (res.user || res.token) {
         alert("Verification successful!");
-        navigate("/dashboard/book-slot"); // Redirect to user dashboard
+        navigate("/dashboard/book-slot");
       } else {
         alert(res.message || "OTP verification failed");
       }
