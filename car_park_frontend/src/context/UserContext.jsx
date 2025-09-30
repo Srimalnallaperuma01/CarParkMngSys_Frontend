@@ -1,62 +1,79 @@
+// src/context/UserContext.jsx
 import React, { createContext, useState } from "react";
 import axios from "axios";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // Safely parse localStorage
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const savedUser = localStorage.getItem("currentUser");
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch (err) {
-      console.error("Failed to parse localStorage user:", err);
+      const saved = localStorage.getItem("currentUser");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
       return null;
     }
   });
 
-  const API_URL = "http://localhost:5000/api/auth";
+  const API = "http://localhost:5000/api/auth";
 
-  // Register
-  const registerUser = async (formData) => {
+  // Step 1: send OTP with full registration data
+  const sendOtp = async (formData) => {
     try {
-      const res = await axios.post(`${API_URL}/register`, formData);
-      const user = res.data.user;
-
-      setCurrentUser(user);
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      if (res.data.token) localStorage.setItem("token", res.data.token);
-
-      return user;
+      const res = await axios.post(`${API}/send-otp`, formData);
+      return res.data;
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Registration failed");
+      throw new Error(err.response?.data?.message || "Failed to send OTP");
     }
   };
 
-  // Login
+  // Step 2: verify OTP (backend will create user) — returns user + token
+  const verifyOtp = async (email, otp) => {
+    try {
+      const res = await axios.post(`${API}/verify-otp`, { email, otp });
+      if (res.data.success) {
+        const { user, token } = res.data;
+        if (token) localStorage.setItem("token", token);
+        if (user) {
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          setCurrentUser(user);
+        }
+        return res.data;
+      } else {
+        throw new Error(res.data.message || "OTP verification failed");
+      }
+    } catch (err) {
+      throw new Error(err.response?.data?.message || err.message || "OTP verification failed");
+    }
+  };
+
+  const resendOtp = async (email, otpMethod = "email") => {
+    try {
+      const res = await axios.post(`${API}/resend-otp`, { email, otpMethod });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.message || "Failed to resend OTP");
+    }
+  };
+
+  // login (bypasses OTP)
   const loginUser = async (email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/login`, { email, password });
-
-      const user = res.data.user || {};  // fallback
-      const token = res.data.token;
-      const role = res.data.role;        // important: capture role
-
-      if (!token || !role) throw new Error("Login failed: Invalid response");
-
-      // Save everything
-      const fullUser = { ...user, role }; // include role in user object
-      localStorage.setItem("token", token);
-      localStorage.setItem("currentUser", JSON.stringify(fullUser));
-      setCurrentUser(fullUser);
-
-      return fullUser;
+      const res = await axios.post(`${API}/login`, { email, password });
+      if (!res.data.success) throw new Error(res.data.message || "Login failed");
+      const { user, token, role } = res.data;
+      if (token) localStorage.setItem("token", token);
+      if (user) {
+        const fullUser = { ...user, role };
+        localStorage.setItem("currentUser", JSON.stringify(fullUser));
+        setCurrentUser(fullUser);
+        return fullUser;
+      }
+      return null;
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Login failed");
+      throw new Error(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
-  // Logout
   const logoutUser = () => {
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
@@ -65,12 +82,7 @@ export const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{
-        currentUser,
-        registerUser,
-        loginUser,
-        logoutUser,
-      }}
+      value={{ currentUser, sendOtp, verifyOtp, resendOtp, loginUser, logoutUser }}
     >
       {children}
     </UserContext.Provider>
