@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState, useContext, useCallback } from "rea
 import axiosInstance from "../api/axiosInstance";
 import { SlotsContext } from "../context/SlotContext";
 import "./LandingPage.css";
-import heroImg from "../images/hero.jpg";
+import heroImg from "../images/hero1.png";
+import logoImg from "../images/logo.png";
 import ScrollTopButton from "./ScrollTopButton";
 
 const LandingPage = () => {
@@ -78,7 +79,11 @@ const LandingPage = () => {
     <div className="landing-container">
       {/* Header */}
       <header className="header">
-        <div className="logo">Parkly</div>
+        <div className="logo">
+          <img src={logoImg} alt="logo1" />
+          
+
+        </div>
         <nav className="nav">
           {["about","privacy","contact","slots","book"].map((section) => (
             <button

@@ -31,9 +31,22 @@
 }
 
 .logo {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 30px; /* space between logo and text */
   font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff; /* adjust to your theme */
 }
+
+.logo img {
+  width: 40px;  /* adjust size */
+  height: auto;
+  transform: scale(6.0);
+}
+
+
+
 
 .nav .nav-btn {
   background: none;
@@ -73,7 +86,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f0f8ff;
+  
   min-height: 100vh;
   width: 100%;
   padding: 0 30px;
@@ -135,7 +148,14 @@
   max-width: 100%;
   height: auto;
   border-radius: 25px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  transform: scale(1.3);
+  transition: transform 0.4s ease-in-out;
+  
+}
+
+.hero-img:hover {
+  transform: scale(1.32);
+  
 }
 
 /* =========================
