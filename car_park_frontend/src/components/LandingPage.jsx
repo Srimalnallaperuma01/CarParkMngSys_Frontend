@@ -4,6 +4,10 @@ import { SlotsContext } from "../context/SlotContext";
 import "./LandingPage.css";
 import heroImg from "../images/hero1.png";
 import logoImg from "../images/logo.png";
+import aboutImg from "../images/about.png";
+import policyImg from "../images/policy.png";
+import contactImg from "../images/contacts.png";
+import bookImg from "../images/booking.png";
 import ScrollTopButton from "./ScrollTopButton";
 
 const LandingPage = () => {
@@ -21,31 +25,41 @@ const LandingPage = () => {
   // Scroll to section
   const scrollToSection = (ref) => ref.current?.scrollIntoView({ behavior: "smooth" });
 
-  // Handle active section on scroll
-  const handleScroll = () => {
-    const sections = [
-      { id: "hero", ref: heroRef },
-      { id: "about", ref: aboutRef },
-      { id: "privacy", ref: privacyRef },
-      { id: "contact", ref: contactRef },
-      { id: "slots", ref: slotsRef },
-      { id: "book", ref: bookRef },
-    ];
-    const scrollPosition = window.scrollY + window.innerHeight / 2;
-    sections.forEach((section) => {
-      if (
-        section.ref.current.offsetTop <= scrollPosition &&
-        section.ref.current.offsetTop + section.ref.current.offsetHeight > scrollPosition
-      ) {
-        setActiveSection(section.id);
-      }
-    });
-  };
+const handleScroll = () => {
+  const sections = [
+    { id: "hero", ref: heroRef },
+    { id: "slots", ref: slotsRef },
+    { id: "about", ref: aboutRef },
+    { id: "privacy", ref: privacyRef },
+    { id: "contact", ref: contactRef },
+    { id: "book", ref: bookRef },
+  ];
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+  for (let section of sections) {
+    const element = section.ref.current;
+    if (!element) continue; // <-- skip if not mounted
+
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    const bottom = top + element.offsetHeight;
+
+    if (scrollPosition >= top && scrollPosition < bottom) {
+      setActiveSection(section.id);
+      break;
+    }
+  }
+};
+
+useEffect(() => {
+  window.addEventListener("scroll", handleScroll);
+
+  // Call once after all refs are likely mounted
+  setTimeout(() => handleScroll(), 100);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
   // Fetch slots
   const fetchSlots = useCallback(async () => {
@@ -84,7 +98,7 @@ const LandingPage = () => {
           <span className="logo-text"></span>
         </div>
         <nav className="nav">
-          {["about","privacy","contact","slots","book"].map((section) => (
+          {["slots","about","privacy","contact","book"].map((section) => (
             <button
               key={section}
               className={`nav-btn ${activeSection === section ? "active" : ""}`}
@@ -135,34 +149,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* About Section */}
-      <section ref={aboutRef} className="section about-section full-screen-section animate-fade-up">
-        <h2>About Parkly</h2>
-        <p>
-          Parkly is a modern car park management system that saves your time and stress. Real-time slot availability,
-          easy booking, and QR code verification make parking seamless. Designed for both users and admins to
-          manage parking efficiently.
-        </p>
-      </section>
 
-      {/* Privacy Section */}
-      <section ref={privacyRef} className="section privacy-section full-screen-section animate-fade-up">
-        <h2>Privacy & Policy</h2>
-        <p>
-          Parkly prioritizes user privacy. All personal and vehicle information is securely stored. Payment details
-          and bookings are confidential and only used for park management and verification purposes.
-        </p>
-      </section>
-
-      {/* Contact Section */}
-      <section ref={contactRef} className="section contact-section full-screen-section animate-fade-up">
-        <h2>Contact Us</h2>
-        <p>Email: support@parkly.com</p>
-        <p>Phone: +94 77 123 4567</p>
-        <p>Address: 123 Parkly Street, Colombo, Sri Lanka</p>
-      </section>
-
-      {/* Availability Section */}
+{/* Availability Section */}
       <section ref={slotsRef} className="section availability-section full-screen-section animate-fade-up">
         <div className="availability-table-container">
           <h2>Slot Availability</h2>
@@ -202,13 +190,57 @@ const LandingPage = () => {
         </div>
       </section>
 
+
+      {/* About Section */}
+      <section ref={aboutRef} className="section about-section full-screen-section animate-fade-up">
+        <h2>About Parkly</h2>
+        <div>
+          <img className="about-img" src={aboutImg} alt="about" />
+          <p>
+          Parkly is a modern car park management system that saves your time and stress. Real-time slot availability,
+          easy booking, and QR code verification make parking seamless. Designed for both users and admins to
+          manage parking efficiently.
+          </p>
+        </div>
+      </section>
+
+      {/* Privacy Section */}
+      <section ref={privacyRef} className="section privacy-section full-screen-section animate-fade-up">
+        <h2>Privacy & Policy</h2>
+        <div>
+         <img className="policy-img" src={policyImg} alt="about" />
+        <p>
+          Parkly prioritizes user privacy. All personal and vehicle information is securely stored. Payment details
+          and bookings are confidential and only used for park management and verification purposes.
+        </p>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section ref={contactRef} className="section contact-section full-screen-section animate-fade-up">
+        <h2>Contact Us</h2>
+        <div>
+        <img className="contact-img" src={contactImg} alt="about" />
+        <div><p>Email: parkly2025@gmail.com</p>
+        <p>Phone: +94 78 900 54 40</p>
+        <p>Address: 2025 - Parkly , Matara, Sri Lanka</p></div>
+        </div>
+      </section>
+
+      
+
       {/* Book Slot Section */}
       <section ref={bookRef} className="section book-section full-screen-section animate-fade-up">
         <h2>Book a Slot</h2>
+        <div>
+        <img className="book-img" src={bookImg} alt="about" />
+        <div>
         <p>
           Login or register to reserve your preferred parking slot instantly. Parkly makes your parking hassle-free and secure.
         </p>
         <a href="/login" className="btn-flat btn-blue">Login to Book</a>
+        </div>
+        </div>
       </section>
 
       {/* Footer */}
