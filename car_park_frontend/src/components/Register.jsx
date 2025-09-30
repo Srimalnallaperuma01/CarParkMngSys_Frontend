@@ -6,13 +6,17 @@ import "./Register.css";
 const Register = () => {
   const { registerUser } = useContext(UserContext);
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     nic: "",
     vehicleNumber: "",
+    phone: "",
+    otpMethod: "email", // default OTP method
   });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -24,10 +28,10 @@ const Register = () => {
     setLoading(true);
     try {
       await registerUser(formData);
-      alert("Registration successful!");
-      navigate("/login");
+      alert("Registration successful! Please verify your account via OTP.");
+      navigate("/verify-otp");
     } catch (err) {
-      alert("Registration failed: " + err);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -35,8 +39,8 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>Create an Account</h2>
+      <form onSubmit={handleSubmit} className="register-form">
         <input
           type="text"
           name="username"
@@ -77,6 +81,22 @@ const Register = () => {
           onChange={handleChange}
           required
         />
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone Number (Optional for SMS OTP)"
+          value={formData.phone}
+          onChange={handleChange}
+        />
+        <select
+          name="otpMethod"
+          value={formData.otpMethod}
+          onChange={handleChange}
+          required
+        >
+          <option value="email">Email OTP</option>
+          <option value="phone">SMS OTP</option>
+        </select>
         <button type="submit" disabled={loading}>
           {loading ? "Registering..." : "Register"}
         </button>

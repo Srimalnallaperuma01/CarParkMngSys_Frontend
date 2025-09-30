@@ -10,6 +10,7 @@ import GuestBooking from "./components/GuestBooking";
 import About from "./components/AboutUs";
 import Privacy from "./components/PrivacyPolicy";
 import Contact from "./components/ContactUs";
+import VerifyOtp from "./components/VerifyOtp";
 
 // User Dashboard Pages
 import Dashboard from "./components/Dashboard";
@@ -27,6 +28,12 @@ import AdminBookings from "./components/AdminBookings";
 export default function App() {
   const { currentUser } = useContext(UserContext);
 
+  const requireUserVerification = (element) => {
+    if (!currentUser) return <Navigate to="/login" />;
+    if (currentUser.role === "user" && currentUser.isVerified === false) return <Navigate to="/verify-otp" />;
+    return element;
+  };
+
   return (
     <Routes>
       {/* Public Routes */}
@@ -37,40 +44,24 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
-      {/* Public Book Slot: redirect to login if not logged in */}
-      <Route
-        path="/book"
-        element={currentUser ? <BookSlot /> : <Navigate to="/login" />}
-      />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
 
       {/* User Dashboard */}
-      <Route
-        path="/dashboard/*"
-        element={
-          currentUser?.role === "user" ? <Dashboard /> : <Navigate to="/login" />
-        }
-      >
+      <Route path="/dashboard/*" element={currentUser?.role === "user" ? requireUserVerification(<Dashboard />) : <Navigate to="/login" />}>
         <Route path="book-slot" element={<BookSlot />} />
         <Route path="my-bookings" element={<MyBookings />} />
         <Route path="payments" element={<Payments />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
 
-      {/* Admin Dashboard */}
-      <Route
-        path="/admin/*"
-        element={
-          currentUser?.role === "admin" || currentUser?.role === "superadmin"
-            ? <AdminDashboard />
-            : <Navigate to="/login" />
-        }
-      >
+      {/* Admin Dashboard (no OTP check) */}
+      <Route path="/admin/*" element={currentUser && (currentUser.role === "admin" || currentUser.role === "superadmin") ? <AdminDashboard /> : <Navigate to="/login" />}>
         <Route path="users" element={<UsersAdminList />} />
         <Route path="slots" element={<AdminSlotManagement />} />
         <Route path="bookings" element={<AdminBookings />} />
       </Route>
 
-      {/* Catch-all: redirect unknown paths to landing page */}
+      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
