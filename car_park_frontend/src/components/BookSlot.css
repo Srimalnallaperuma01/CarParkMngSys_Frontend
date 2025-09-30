@@ -18,8 +18,8 @@
   margin-bottom: 20px;
 }
 
+/* Slot cards */
 .slot-card {
-  border: 2px solid #ccc;
   border-radius: 12px;
   padding: 15px;
   text-align: center;
@@ -29,18 +29,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: white;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .slot-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.2);
 }
 
 .slot-card.selected {
-  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6);
-  border-color: #1E90FF;
-  transform: translateY(-3px);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(30, 144, 255, 0.6);
+  border: 2px solid #1E90FF;
 }
 
 .slot-number {
@@ -51,13 +52,46 @@
 
 .slot-status {
   font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.slot-price {
+  font-weight: 500;
+}
+
+/* Payment Slip Section */
+.payment-slip-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.payment-slip-label {
+  background-color: #1E90FF;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.payment-slip-label:hover {
+  background-color: #0052cc;
 }
 
 .payment-slip-input {
-  display: block;
-  margin: 10px auto 15px auto;
+  display: none;
 }
 
+.payment-slip-name {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Book button */
 .book-button {
   display: block;
   width: 100%;
@@ -69,6 +103,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin-top: 15px;
 }
 
 .book-button:disabled {
@@ -80,6 +115,7 @@
   background: #0052cc;
 }
 
+/* Booking confirmation */
 .booking-confirmation {
   margin-top: 20px;
   padding: 15px;
