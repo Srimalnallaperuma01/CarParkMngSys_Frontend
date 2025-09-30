@@ -33,20 +33,28 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 30px; /* space between logo and text */
+  gap: 10px;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff; /* adjust to your theme */
+  color: #fff;
 }
 
 .logo img {
-  width: 40px;  /* adjust size */
+  margin-left: 10px;
+  width: 45px;
   height: auto;
+  transform: none;
+  transition: transform 0.3s ease;
   transform: scale(6.0);
 }
 
+.logo img:hover {
+  transform: rotate(-1deg) scale(6.05);
+}
 
-
+.logo-text {
+  font-weight: 600;
+}
 
 .nav .nav-btn {
   background: none;
@@ -86,10 +94,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  
   min-height: 100vh;
   width: 100%;
   padding: 0 30px;
+  background: linear-gradient(to right, #f0f8ff, #ffffff);
 }
 
 .hero-content {
@@ -148,14 +156,41 @@
   max-width: 100%;
   height: auto;
   border-radius: 25px;
-  transform: scale(1.3);
+  transform: scale(1.1);
   transition: transform 0.4s ease-in-out;
-  
 }
 
 .hero-img:hover {
-  transform: scale(1.32);
-  
+  transform: scale(1.15);
+}
+
+/* =========================
+   Features Section
+   ========================= */
+.features-section {
+  background: #f9fcff;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.feature-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  font-weight: 500;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
 }
 
 /* =========================
@@ -238,24 +273,20 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto; /* let columns adjust to content */
+  table-layout: auto;
 }
-
-
 
 th, td {
   padding: 12px 10px;
-  text-align: center; /* center all columns by default */
+  text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid #ddd;
 }
 
-th.slot-number, td.slot-number { text-align: left; text-align: left; }
-th.slot-status, td.slot-status {text-align: center ;text-align: center }
-th.slot-price, td.slot-price { text-align: right; text-align: right; }
+th.slot-number, td.slot-number { text-align: left; }
+th.slot-status, td.slot-status { text-align: center; }
+th.slot-price, td.slot-price { text-align: right; }
 
-
-/* Status classes */
 td.slot-status.available { background-color: #28a745; color: #fff; }
 td.slot-status.booked { background-color: #dc3545; color: #fff; }
 td.slot-status.pending { background-color: #FFC107; color: #333; }
@@ -263,8 +294,34 @@ td.slot-status.unknown { background-color: #6c757d; color: #fff; }
 
 tr:hover td { background-color: rgba(30, 144, 255, 0.1); }
 
-/* Responsive */
+/* =========================
+   Footer
+   ========================= */
+.footer {
+  background-color: #1E90FF;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Responsive
+   ========================= */
 @media (max-width: 768px) {
+  .hero-content { flex-direction: column; text-align: center; }
+  .hero-left { padding-right: 0; }
+  .hero-right { margin-top: 20px; }
   .availability-table-container { padding: 15px; }
   table, th, td { font-size: 0.9rem; }
 }

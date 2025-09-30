@@ -80,9 +80,8 @@ const LandingPage = () => {
       {/* Header */}
       <header className="header">
         <div className="logo">
-          <img src={logoImg} alt="logo1" />
-          
-
+          <img src={logoImg} alt="logo" />
+          <span className="logo-text"></span>
         </div>
         <nav className="nav">
           {["about","privacy","contact","slots","book"].map((section) => (
@@ -122,6 +121,17 @@ const LandingPage = () => {
           <div className="hero-right animate-slide-right">
             <img src={heroImg} alt="Car Parking" className="hero-img" />
           </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="section features-section animate-fade-up">
+        <h2>Why Choose Parkly?</h2>
+        <div className="features-grid">
+          <div className="feature-card">🚗 Real-Time Slot Updates</div>
+          <div className="feature-card">📲 Easy Online Booking</div>
+          <div className="feature-card">🔒 Secure & Verified</div>
+          <div className="feature-card">📍 Convenient Locations</div>
         </div>
       </section>
 
@@ -195,7 +205,18 @@ const LandingPage = () => {
         <p>
           Login or register to reserve your preferred parking slot instantly. Parkly makes your parking hassle-free and secure.
         </p>
+        <a href="/login" className="btn-flat btn-blue">Login to Book</a>
       </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p>© 2025 Parkly. All rights reserved.</p>
+        <div className="footer-links">
+          <a href="#about">About</a> | 
+          <a href="#privacy">Privacy</a> | 
+          <a href="#contact">Contact</a>
+        </div>
+      </footer>
 
       <ScrollTopButton />
     </div>
