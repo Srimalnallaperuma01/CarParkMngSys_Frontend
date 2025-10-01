@@ -94,20 +94,21 @@ const UsersAdminList = () => {
                 <td>{user.email || "-"}</td>
                 <td>{user.vehicleNumber || "-"}</td>
                 <td>
-                  {user.bookings && user.bookings.length > 0 ? (
-                    <ul>
-                      {user.bookings.map((b, idx) => (
-                        <li key={idx}>
-                          {b.slotName || b.slot?.name || "Slot"} -{" "}
-                          {b.date ? new Date(b.date).toLocaleDateString() : "-"} (
-                          {b.status || "-"})
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    "No bookings"
-                  )}
-                </td>
+  {user.bookings && user.bookings.length > 0 ? (
+    <ul>
+      {user.bookings.map((b, idx) => (
+        <li key={idx}>
+          {b.slotName || b.slot?.name || "Slot"} -{" "}
+          {b.date ? new Date(b.date).toLocaleDateString() : "-"} (
+          {b.status || "-"})
+        </li>
+      ))}
+    </ul>
+  ) : (
+    "No bookings"
+  )}
+</td>
+
                 <td>
                   <QRCode value={user.qrCode || user._id || ""} size={64} />
                 </td>

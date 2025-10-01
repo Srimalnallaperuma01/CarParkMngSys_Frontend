@@ -20,10 +20,11 @@ const Dashboard = () => {
           ["pending", "approved"].includes(b.status.toLowerCase())
         );
 
-        // Map slots with status
+        // Map slots with slot number, status, and date
         const mappedSlots = filteredBookings.map((b) => ({
           id: b.slot?.slotNumber || b.slot?.name || "Unknown",
-          status: b.status.toLowerCase(), // pending / approved
+          status: b.status.toLowerCase(),
+          date: b.date ? new Date(b.date).toLocaleDateString() : null,
         }));
 
         setSlotsData(mappedSlots);
@@ -40,9 +41,9 @@ const Dashboard = () => {
     switch (status.toLowerCase()) {
       case "approved":
       case "booked":
-        return "Approved"; // Admin approved
+        return "Approved";
       case "pending":
-        return "Pending Approval"; // User pending
+        return "Pending Approval";
       default:
         return "Unknown";
     }
@@ -92,13 +93,16 @@ const Dashboard = () => {
           {slotsData.length === 0 ? (
             <p>No pending or approved bookings yet.</p>
           ) : (
-            slotsData.map((slot) => (
+            slotsData.map((slot, idx) => (
               <div
-                key={slot.id}
+                key={idx}
                 className={`slot-card ${getStatusClass(slot.status)}`}
-                title={`Slot ${slot.id} - ${formatStatus(slot.status)}`}
+                title={`Slot ${slot.id} - ${formatStatus(slot.status)}${
+                  slot.date ? ` - ${slot.date}` : ""
+                }`}
               >
                 <span className="slot-id">{slot.id}</span>
+                {slot.date && <small className="slot-date">{slot.date}</small>}
                 <small className="slot-status">{formatStatus(slot.status)}</small>
               </div>
             ))
