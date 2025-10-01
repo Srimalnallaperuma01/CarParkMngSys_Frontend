@@ -4,11 +4,56 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import "./Dashboard.css";
 
+// Leaflet imports
+import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Fix Leaflet marker icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
+
+// Marker for selecting destination
+const DestinationMarker = ({ destinationPosition, setDestinationPosition }) => {
+  useMapEvents({
+    click(e) {
+      setDestinationPosition(e.latlng);
+    },
+  });
+  return destinationPosition ? <Marker position={destinationPosition} /> : null;
+};
+
+// Haversine distance (optional)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [slotsData, setSlotsData] = useState([]);
 
+  const [startPosition, setStartPosition] = useState(null); // user current location
+  const [destinationPosition, setDestinationPosition] = useState(null); // clicked or input
+  const [destinationInput, setDestinationInput] = useState(""); // address input
+  const [routeCoords, setRouteCoords] = useState([]);
+  const [routeInfo, setRouteInfo] = useState({ distance: 0, duration: 0 });
+
+  const ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImE4MmQxYjJmNmYyNTQwNzhiZjljMWQ5NjM3OTNmM2M0IiwiaCI6Im11cm11cjY0In0="; // replace with your key
+
+  // Fetch bookings & get user GPS
   useEffect(() => {
     const fetchSlots = async () => {
       try {
@@ -33,8 +78,19 @@ const Dashboard = () => {
     };
 
     fetchSlots();
+
+    // Get current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setStartPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setStartPosition({ lat: 6.9271, lng: 79.8612 }) // fallback Colombo
+      );
+    } else {
+      setStartPosition({ lat: 6.9271, lng: 79.8612 });
+    }
   }, []);
 
+  // Slot helpers
   const formatStatus = (status) => {
     switch (status.toLowerCase()) {
       case "approved":
@@ -59,10 +115,62 @@ const Dashboard = () => {
     }
   };
 
-  // --- Logout function ---
+  // Logout
   const logoutUser = () => {
-    localStorage.removeItem("token"); // remove auth token
-    navigate("/login"); // redirect to login
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  // Get route from ORS
+  const getRoute = async (destPos) => {
+    if (!startPosition || !destPos) return;
+
+    const start = `${startPosition.lng},${startPosition.lat}`;
+    const end = `${destPos.lng},${destPos.lat}`;
+
+    try {
+      const res = await fetch(
+        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${ORS_API_KEY}&start=${start}&end=${end}`
+      );
+      const data = await res.json();
+      const coords = data.features[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+      const distance = data.features[0].properties.summary.distance / 1000; // km
+      const duration = data.features[0].properties.summary.duration / 60; // min
+
+      setRouteCoords(coords);
+      setRouteInfo({ distance, duration });
+    } catch (err) {
+      console.error("Route error:", err);
+    }
+  };
+
+  // Handle destination submit (address input)
+  const handleDestinationSubmit = async (e) => {
+    e.preventDefault();
+    let destPos = destinationPosition;
+
+    if (!destPos && destinationInput) {
+      // Geocode address
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destinationInput)}`
+        );
+        const geoData = await geoRes.json();
+        if (geoData.length > 0) {
+          const { lat, lon } = geoData[0];
+          destPos = { lat: parseFloat(lat), lng: parseFloat(lon) };
+          setDestinationPosition(destPos);
+        } else {
+          alert("Address not found!");
+          return;
+        }
+      } catch (err) {
+        console.error("Geocoding error:", err);
+        return;
+      }
+    }
+
+    if (destPos) getRoute(destPos);
   };
 
   return (
@@ -70,7 +178,7 @@ const Dashboard = () => {
       <nav className="dashboard-nav">
         <h3>User Dashboard</h3>
         <ul>
-          <li className={location.pathname === "/" ? "active" : ""}>
+          <li className={location.pathname === "/dashboard" ? "active" : ""}>
             <Link to="/dashboard">Home</Link>
           </li>
           <li className={location.pathname.includes("/book-slot") ? "active" : ""}>
@@ -86,14 +194,13 @@ const Dashboard = () => {
             <Link to="/dashboard/notifications">Notifications</Link>
           </li>
           <li>
-            <button className="logout-btn" onClick={logoutUser}>
-              Logout
-            </button>
+            <button className="logout-btn" onClick={logoutUser}>Logout</button>
           </li>
         </ul>
       </nav>
 
       <main className="dashboard-main">
+        {/* Slots Section */}
         <div className="slots-preview">
           {slotsData.length === 0 ? (
             <p>No pending or approved bookings yet.</p>
@@ -114,6 +221,76 @@ const Dashboard = () => {
             ))
           )}
         </div>
+
+        {/* Map & Directions: only for /dashboard */}
+        {location.pathname === "/dashboard" && startPosition && (
+          <div style={{ marginTop: "40px" }}>
+            <h3>Map & Directions</h3>
+
+            <form onSubmit={handleDestinationSubmit} style={{ marginBottom: "10px" }}>
+              <input
+                type="text"
+                placeholder="Enter destination address or coordinates"
+                value={
+                  destinationPosition
+                    ? `${destinationPosition.lat.toFixed(5)}, ${destinationPosition.lng.toFixed(5)}`
+                    : destinationInput
+                }
+                onChange={(e) => setDestinationInput(e.target.value)}
+                style={{ padding: "8px", width: "300px", marginRight: "10px" }}
+              />
+              <button type="submit">Get Route</button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => setStartPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                      () => alert("Cannot get GPS location")
+                    );
+                  }
+                }}
+                style={{ marginLeft: "10px" }}
+              >
+                Scan My Location
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDestinationPosition(null);
+                  setRouteCoords([]);
+                  setDestinationInput("");
+                }}
+                style={{ marginLeft: "10px" }}
+              >
+                Refresh
+              </button>
+            </form>
+
+            <MapContainer
+              center={startPosition}
+              zoom={13}
+              style={{ height: "400px", width: "100%", borderRadius: "12px" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <Marker position={startPosition} />
+              <DestinationMarker
+                destinationPosition={destinationPosition}
+                setDestinationPosition={setDestinationPosition}
+              />
+              {routeCoords.length > 0 && <Polyline positions={routeCoords} color="blue" />}
+            </MapContainer>
+
+            {destinationPosition && routeCoords.length > 0 && (
+              <p>
+                Distance: {routeInfo.distance.toFixed(2)} km, Duration: {routeInfo.duration.toFixed(1)} min
+              </p>
+            )}
+          </div>
+        )}
 
         <Outlet context={{ slotsData, setSlotsData }} />
       </main>
