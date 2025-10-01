@@ -1,14 +1,13 @@
-// src/components/MyBookings.jsx
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { saveAs } from "file-saver";
 import { SlotsContext } from "../context/SlotContext";
 import { UserContext } from "../context/UserContext";
 import axiosInstance from "../api/axiosInstance";
 import "./MyBookings.css";
 
+// Helper functions
 const normalizeStatus = (status) => {
   if (!status) return "pending";
   const s = status.toLowerCase();
@@ -33,18 +32,21 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const qrRefs = useRef({});
 
+  // Fetch bookings for the logged-in user only
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axiosInstance.get("/bookings");
-        setBookings(response.data.bookings || response.data);
-      } catch (error) {
-        console.error("Error fetching bookings:", error);
+        const res = await axiosInstance.get("/bookings"); // backend returns only user's bookings
+        setBookings(res.data.bookings || res.data);
+      } catch (err) {
+        console.error("Error fetching bookings:", err);
       }
     };
-    fetchBookings();
+
+    if (currentUser) fetchBookings();
   }, [currentUser]);
 
+  // Cancel a booking
   const cancelBooking = async (booking) => {
     if (normalizeStatus(booking.status) !== "pending") {
       return alert("You can only cancel pending bookings.");
@@ -52,17 +54,20 @@ const MyBookings = () => {
     try {
       await axiosInstance.delete(`/bookings/${booking._id}`);
       setBookings(bookings.filter((b) => b._id !== booking._id));
+
+      // Update slots locally
       setSlotsData(
         slotsData.map((slot) =>
           slot.id === booking.slot?._id ? { ...slot, status: "available" } : slot
         )
       );
-    } catch (error) {
-      console.error("Error cancelling booking:", error);
-      alert("Cancel failed: " + (error.response?.data?.message || error.message));
+    } catch (err) {
+      console.error("Cancel booking error:", err);
+      alert(err.response?.data?.message || err.message || "Cancel failed");
     }
   };
 
+  // Generate PDF ticket
   const generateTicketPDF = async (booking) => {
     const ticketDiv = qrRefs.current[booking._id];
     if (!ticketDiv) return;
@@ -91,22 +96,21 @@ const MyBookings = () => {
 
         return (
           <div key={b._id} className="booking-card">
-            {/* Booking Strip */}
-            <div className="booking-strip" onClick={() => status === "approved" && window.open(`/ticket/${b._id}`)}>
+            <div className="booking-strip">
               <strong>{b.slot?.slotNumber || "N/A"}</strong> | {bookingDate?.toLocaleDateString()} {bookingDate?.toLocaleTimeString()} | 
               <span className="status-badge" style={{ backgroundColor: getStatusColor(status) }}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </span>
             </div>
 
-            {/* Ticket Card (hidden/used for PDF) */}
+            {/* Hidden ticket card for PDF generation */}
             {status === "approved" && (
               <div ref={(el) => (qrRefs.current[b._id] = el)} className="ticket-card">
                 <h2>Parkly</h2>
                 <p><em>"Your trusted parking partner"</em></p>
                 <hr />
                 <h3>Entrance Ticket</h3>
-                <p><strong>User:</strong> {currentUser.name} | {currentUser.email}</p>
+                <p><strong>User:</strong> {currentUser.username} | {currentUser.email}</p>
                 <p><strong>Slot:</strong> {b.slot?.slotNumber || "N/A"}</p>
                 <p><strong>Date:</strong> {bookingDate.toLocaleDateString()}</p>
                 <p><strong>Time:</strong> {bookingDate.toLocaleTimeString()}</p>
@@ -116,13 +120,17 @@ const MyBookings = () => {
               </div>
             )}
 
-            {/* Booking Actions */}
+            {/* Booking actions */}
             <div className="booking-actions">
               {status === "approved" && (
-                <button className="btn-ticket" onClick={() => generateTicketPDF(b)}>Download Ticket PDF</button>
+                <button className="btn-ticket" onClick={() => generateTicketPDF(b)}>
+                  Download Ticket PDF
+                </button>
               )}
               {status === "pending" && (
-                <button className="btn-cancel" onClick={() => cancelBooking(b)}>Cancel Booking</button>
+                <button className="btn-cancel" onClick={() => cancelBooking(b)}>
+                  Cancel Booking
+                </button>
               )}
             </div>
           </div>
