@@ -83,10 +83,10 @@ const Dashboard = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setStartPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setStartPosition({ lat: 6.9271, lng: 79.8612 }) // fallback Colombo
+        () => setStartPosition({ lat: 5.9381636, lng: 80.576851 }) // fallback Colombo
       );
     } else {
-      setStartPosition({ lat: 6.9271, lng: 79.8612 });
+      setStartPosition({ lat: 5.9381636, lng: 80.576851 });
     }
   }, []);
 
@@ -241,19 +241,24 @@ const Dashboard = () => {
               />
               <button type="submit">Get Route</button>
               <button
-                type="button"
-                onClick={() => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      (pos) => setStartPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                      () => alert("Cannot get GPS location")
-                    );
-                  }
-                }}
-                style={{ marginLeft: "10px" }}
-              >
-                Scan My Location
-              </button>
+  type="button"
+  onClick={() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setStartPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => {
+          console.error("GPS Error:", err);
+          alert("Cannot get GPS location. Please allow location access or enter manually.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  }}
+>
+  Scan My Location
+</button>
+
               <button
                 type="button"
                 onClick={() => {
