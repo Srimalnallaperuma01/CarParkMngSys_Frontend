@@ -1,11 +1,12 @@
 // src/components/Dashboard.jsx
 import React, { useState, useEffect } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [slotsData, setSlotsData] = useState([]);
 
   useEffect(() => {
@@ -14,12 +15,10 @@ const Dashboard = () => {
         const res = await axiosInstance.get("/bookings");
         const bookings = res.data.bookings || res.data;
 
-        // Only include pending or approved bookings
         const filteredBookings = bookings.filter((b) =>
           ["pending", "approved"].includes(b.status.toLowerCase())
         );
 
-        // Map slots with slot number, status, and date
         const mappedSlots = filteredBookings.map((b) => ({
           id: b.slot?.slotNumber || b.slot?.name || "Unknown",
           status: b.status.toLowerCase(),
@@ -60,13 +59,19 @@ const Dashboard = () => {
     }
   };
 
+  // --- Logout function ---
+  const logoutUser = () => {
+    localStorage.removeItem("token"); // remove auth token
+    navigate("/login"); // redirect to login
+  };
+
   return (
     <div className="dashboard-container">
       <nav className="dashboard-nav">
         <h3>User Dashboard</h3>
         <ul>
           <li className={location.pathname === "/" ? "active" : ""}>
-            <Link to="/">Home</Link>
+            <Link to="/dashboard">Home</Link>
           </li>
           <li className={location.pathname.includes("/book-slot") ? "active" : ""}>
             <Link to="/dashboard/book-slot">Book Slot</Link>
@@ -79,6 +84,11 @@ const Dashboard = () => {
           </li>
           <li className={location.pathname.includes("/notifications") ? "active" : ""}>
             <Link to="/dashboard/notifications">Notifications</Link>
+          </li>
+          <li>
+            <button className="logout-btn" onClick={logoutUser}>
+              Logout
+            </button>
           </li>
         </ul>
       </nav>

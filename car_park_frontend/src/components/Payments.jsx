@@ -105,9 +105,14 @@ const Payments = () => {
               {b.paymentSlip && (
                 <p>
                   <strong>Slip:</strong>{" "}
-                  <a href={b.paymentSlip} target="_blank" rel="noopener noreferrer">
-                    View / Download
+                  <a
+                    href={`http://localhost:5000/uploads/payments/${b.paymentSlip}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+>
+                        View / Download
                   </a>
+
                 </p>
               )}
             </li>

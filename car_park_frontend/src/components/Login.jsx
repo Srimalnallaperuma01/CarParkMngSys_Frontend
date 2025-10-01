@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import "./Login.css";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const { loginUser } = useContext(UserContext);
@@ -34,7 +35,8 @@ const Login = () => {
       <form onSubmit={handleSubmit} className="login-form">
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
+        <div><button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
+        <Link to="/" className="cancel-btn">Cancel</Link></div>
       </form>
     </div>
   );

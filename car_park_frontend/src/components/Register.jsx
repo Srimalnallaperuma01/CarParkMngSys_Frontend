@@ -3,6 +3,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import "./Register.css";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const { sendOtp } = useContext(UserContext);
@@ -103,6 +104,8 @@ const Register = () => {
         <button type="button" onClick={handleSendOtp} disabled={loading}>
           {loading ? "Sending OTP..." : "Send OTP & Verify"}
         </button>
+
+        <Link to="/" className="cancel-btn">Cancel</Link>
       </form>
     </div>
   );

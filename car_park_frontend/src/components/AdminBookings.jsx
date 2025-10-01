@@ -110,6 +110,15 @@ const AdminBookings = () => {
       Cancel
     </button>
   )}
+
+  {(b.status.toLowerCase() === "rejected" && 
+    <button 
+      onClick={() => cancelBooking(b._id)} 
+      style={{ backgroundColor: "#6c757d", color: "#fff" }}
+    >
+      Cancel
+    </button>
+  )}
 </td>
 
 </tr>
