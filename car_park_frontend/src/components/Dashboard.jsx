@@ -11,7 +11,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        // Get all bookings of the current user
         const res = await axiosInstance.get("/bookings");
         const bookings = res.data.bookings || res.data;
 
@@ -25,6 +24,7 @@ const Dashboard = () => {
           id: b.slot?.slotNumber || b.slot?.name || "Unknown",
           status: b.status.toLowerCase(),
           date: b.date ? new Date(b.date).toLocaleDateString() : null,
+          payment: b.paymentSlip ? "Received" : "Not Received",
         }));
 
         setSlotsData(mappedSlots);
@@ -36,7 +36,6 @@ const Dashboard = () => {
     fetchSlots();
   }, []);
 
-  // User-friendly labels
   const formatStatus = (status) => {
     switch (status.toLowerCase()) {
       case "approved":
@@ -49,7 +48,6 @@ const Dashboard = () => {
     }
   };
 
-  // Conditional classes for slot badges
   const getStatusClass = (status) => {
     switch (status.toLowerCase()) {
       case "approved":
@@ -86,9 +84,6 @@ const Dashboard = () => {
       </nav>
 
       <main className="dashboard-main">
-        <h2>Welcome to Your Dashboard</h2>
-        <p>Select an option from the sidebar to get started.</p>
-
         <div className="slots-preview">
           {slotsData.length === 0 ? (
             <p>No pending or approved bookings yet.</p>
@@ -99,11 +94,12 @@ const Dashboard = () => {
                 className={`slot-card ${getStatusClass(slot.status)}`}
                 title={`Slot ${slot.id} - ${formatStatus(slot.status)}${
                   slot.date ? ` - ${slot.date}` : ""
-                }`}
+                } - Payment: ${slot.payment}`}
               >
                 <span className="slot-id">{slot.id}</span>
                 {slot.date && <small className="slot-date">{slot.date}</small>}
                 <small className="slot-status">{formatStatus(slot.status)}</small>
+                <small className="slot-payment">Payment: {slot.payment}</small>
               </div>
             ))
           )}

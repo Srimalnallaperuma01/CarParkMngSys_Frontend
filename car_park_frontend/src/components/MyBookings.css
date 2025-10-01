@@ -1,30 +1,88 @@
+/* MyBookings.css */
+
 .mybookings-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 10px;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
 }
 
-.booking-card {
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  background-color: #e0f7fa;
+.booking-strip {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  padding: 12px 15px;
+  background: #f1f5f9;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
-.booking-card button {
-  margin-left: 5px;
-  padding: 5px 10px;
+.booking-strip:hover {
+  background: #e2e8f0;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.ticket-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin: 10px 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.ticket-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.ticket-card h3 {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.ticket-card p {
+  margin: 3px 0;
+}
+
+.booking-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-ticket {
+  padding: 8px 15px;
+  background-color: #22c55e;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  color: #fff;
   cursor: pointer;
 }
 
-.booking-card button:hover {
-  opacity: 0.8;
+.btn-ticket:hover {
+  background-color: #16a34a;
+}
+
+.btn-cancel {
+  padding: 8px 15px;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background-color: #b91c1c;
 }
