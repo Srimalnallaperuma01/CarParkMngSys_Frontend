@@ -84,15 +84,15 @@ const Register = () => {
         {errors.password && <span className="error">{errors.password}</span>}
 
         <label>NIC</label>
-        <input name="nic" value={formData.nic} onChange={handleChange} required />
+        <input name="nic" value={formData.nic} onChange={handleChange} placeholder="123456789V  " required />
         {errors.nic && <span className="error">{errors.nic}</span>}
 
         <label>Vehicle Number</label>
-        <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleChange} required />
+        <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleChange} placeholder="ABC-1234" required />
         {errors.vehicleNumber && <span className="error">{errors.vehicleNumber}</span>}
 
         <label>Phone (optional)</label>
-        <input name="phone" value={formData.phone} onChange={handleChange} placeholder="+94..." />
+        <input name="phone" value={formData.phone} onChange={handleChange} placeholder="+941234567" />
         {errors.phone && <span className="error">{errors.phone}</span>}
 
         <label>OTP Method</label>
