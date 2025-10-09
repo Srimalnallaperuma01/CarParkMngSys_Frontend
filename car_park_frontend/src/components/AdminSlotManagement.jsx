@@ -55,15 +55,34 @@ const AdminSlotManagement = () => {
         <button onClick={addSlot}>Add Slot</button>
       </div>
 
-      <ul>
-        {slots.map((slot) => (
-          <li key={slot._id} style={{ margin: "10px 0" }}>
-            {slot.slotNumber} - {slot.status} - {slot.price}
-            <button onClick={() => toggleStatus(slot._id, slot.status)} style={{ marginLeft: "10px" }}>Toggle Status</button>
-            <button onClick={() => deleteSlot(slot._id)} style={{ marginLeft: "10px" }}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <table style={{ width: "100%", marginTop: "10px", borderCollapse: "collapse" }}>
+  
+    <tr>
+      <th>Slot</th>
+      <th>Status</th>
+      <th>Price</th>
+      <th>Actions</th>
+    </tr>
+  
+    {slots.map((slot) => (
+      <tr key={slot._id} style={{ borderBottom: "1px solid #ccc" }}>
+        <td>{slot.slotNumber}</td>
+        <td>{slot.status}</td>
+        <td>{slot.price}</td>
+        <td>
+          <button
+            onClick={() => toggleStatus(slot._id, slot.status)}
+            style={{ marginRight: "10px" }}
+          >
+            Toggle Status
+          </button>
+          <button onClick={() => deleteSlot(slot._id)}>Delete</button>
+        </td>
+      </tr>
+    ))}
+  
+</table>
+
     </div>
   );
 };
