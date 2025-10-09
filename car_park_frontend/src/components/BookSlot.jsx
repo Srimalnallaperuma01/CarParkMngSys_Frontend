@@ -53,7 +53,7 @@ const BookSlot = () => {
   const handleBooking = async () => {
     if (!selectedSlotId) return alert("Please select a slot!");
     if (!paymentSlip) return alert("Please upload a payment slip!");
-    if (!bookingDateTime) return alert("Please select a booking date and time!");
+    
 
     const selectedDate = new Date(bookingDateTime);
     const now = new Date();
@@ -163,7 +163,7 @@ const BookSlot = () => {
       {/* Book Button */}
       <button
         onClick={handleBooking}
-        disabled={!selectedSlotId || !paymentSlip || !bookingDateTime || uploading}
+        disabled={!selectedSlotId || !paymentSlip|| uploading}
         className="book-button"
       >
         {uploading ? "Booking & Uploading..." : "Book Selected Slot"}
