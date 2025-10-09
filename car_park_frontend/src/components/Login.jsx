@@ -20,7 +20,7 @@ const Login = () => {
 
       // No OTP check needed here
       if (userData.role === "admin" || userData.role === "superadmin") navigate("/admin");
-      else if (userData.role === "user") navigate("/dashboard/book-slot");
+      else if (userData.role === "user") navigate("/dashboard");
       else alert("Login failed: Unknown role");
     } catch (err) {
       alert(err.message);
