@@ -74,7 +74,11 @@ const Payments = () => {
       setBookings((prev) =>
         prev.map((b) =>
           b._id === bookingId
-            ? { ...b, paymentSlip: updatedBooking.paymentSlip, paymentSlipUrl: updatedBooking.paymentSlipUrl }
+            ? {
+                ...b,
+                paymentSlip: updatedBooking.paymentSlip,
+                paymentSlipUrl: updatedBooking.paymentSlipUrl,
+              }
             : b
         )
       );
@@ -130,7 +134,9 @@ const Payments = () => {
                 borderLeft: `6px solid ${getStatusColor(slotStatus)}`,
               }}
             >
-              <p><strong>Booking ID:</strong> {b._id}</p>
+              <p>
+                <strong>Booking ID:</strong> {b._id}
+              </p>
               <p>
                 <strong>Slot:</strong> {b.slot?.slotNumber || b.slot?.name || "-"} |{" "}
                 {bookingDate && (
@@ -163,7 +169,7 @@ const Payments = () => {
                 </span>
               </p>
 
-              {b.paymentSlip ? (
+              {b.paymentSlipUrl ? (
                 <p>
                   <strong>Slip:</strong>{" "}
                   <button

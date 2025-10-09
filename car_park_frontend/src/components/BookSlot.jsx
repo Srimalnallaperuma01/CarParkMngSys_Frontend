@@ -37,6 +37,7 @@ const BookSlot = () => {
 
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [paymentSlip, setPaymentSlip] = useState(null);
+  const [bookingDateTime, setBookingDateTime] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -48,39 +49,46 @@ const BookSlot = () => {
     fetchSlots();
   }, [currentUser, navigate, fetchSlots]);
 
+  // Handle booking
   const handleBooking = async () => {
     if (!selectedSlotId) return alert("Please select a slot!");
     if (!paymentSlip) return alert("Please upload a payment slip!");
+    if (!bookingDateTime) return alert("Please select a booking date and time!");
+
+    const selectedDate = new Date(bookingDateTime);
+    const now = new Date();
+    if (selectedDate < now) return alert("Cannot select past date/time!");
 
     try {
       setUploading(true);
 
-      // 1️⃣ Create booking
-      const bookingRes = await axiosInstance.post("/bookings", { slotId: selectedSlotId });
+      // 1️⃣ Create booking with date
+      const bookingRes = await axiosInstance.post("/bookings", {
+        slotId: selectedSlotId,
+        bookingDate: bookingDateTime,
+      });
       const booking = bookingRes.data.booking;
       if (!booking || !booking._id) throw new Error("Booking creation failed");
 
       const bookingId = booking._id;
 
-      // 2️⃣ Upload payment slip to S3
+      // 2️⃣ Upload payment slip
       const formData = new FormData();
       formData.append("slip", paymentSlip);
       const uploadRes = await axiosInstance.post(
         `/bookings/${bookingId}/upload-slip`,
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       // 3️⃣ Get updated booking
-      const updatedBooking = uploadRes.data.booking;
-      setBookingSuccess(updatedBooking);
+      setBookingSuccess(uploadRes.data.booking);
 
       // Reset selection & fetch slots again
       fetchSlots();
       setSelectedSlotId(null);
       setPaymentSlip(null);
+      setBookingDateTime("");
 
       alert("Booking successful! Payment slip uploaded.");
     } catch (err) {
@@ -91,7 +99,7 @@ const BookSlot = () => {
     }
   };
 
-  // Open payment slip in a new tab
+  // Open payment slip in new tab
   const viewSlip = (filePath) => {
     const url = filePath.startsWith("http") ? filePath : `${window.location.origin}/${filePath}`;
     window.open(url, "_blank");
@@ -124,6 +132,18 @@ const BookSlot = () => {
         })}
       </div>
 
+      {/* Booking Date & Time */}
+      <div className="booking-datetime-section">
+        <label htmlFor="booking-datetime">Select Booking Date & Time:</label>
+        <input
+          type="datetime-local"
+          id="booking-datetime"
+          value={bookingDateTime}
+          onChange={(e) => setBookingDateTime(e.target.value)}
+          min={new Date().toISOString().slice(0, 16)} // prevent past datetime
+        />
+      </div>
+
       {/* Payment Slip Upload */}
       <div className="payment-slip-section">
         <label htmlFor="payment-slip" className="payment-slip-label">
@@ -142,7 +162,7 @@ const BookSlot = () => {
       {/* Book Button */}
       <button
         onClick={handleBooking}
-        disabled={!selectedSlotId || !paymentSlip || uploading}
+        disabled={!selectedSlotId || !paymentSlip || !bookingDateTime || uploading}
         className="book-button"
       >
         {uploading ? "Booking & Uploading..." : "Book Selected Slot"}
@@ -155,6 +175,7 @@ const BookSlot = () => {
           <p>Slot: {bookingSuccess.slot?.slotNumber}</p>
           <p>User: {currentUser?.name}</p>
           <p>Status: Pending Approval</p>
+          <p>Date & Time: {new Date(bookingSuccess.bookingDate).toLocaleString()}</p>
 
           {/* View Payment Slip */}
           {bookingSuccess.paymentSlip && (

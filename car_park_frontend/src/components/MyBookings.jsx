@@ -118,7 +118,7 @@ const MyBookings = () => {
             </div>
 
             {/* Payment slip button */}
-            {b.paymentSlip && (
+            {/*b.paymentSlip && (
               <p>
                 <strong>Payment Slip:</strong>{" "}
                 <button
@@ -128,7 +128,7 @@ const MyBookings = () => {
                   View / Download
                 </button>
               </p>
-            )}
+            )*/}
 
             {/* Hidden ticket card for PDF */}
             {status === "approved" && (
@@ -156,7 +156,7 @@ const MyBookings = () => {
                 </p>
 
                 {/* Include payment slip if available */}
-                {b.paymentSlip && (
+                {/*b.paymentSlip && (
                   <p>
                     <strong>Payment Slip:</strong>{" "}
                     <button
@@ -166,7 +166,7 @@ const MyBookings = () => {
                       View / Download
                     </button>
                   </p>
-                )}
+                )*/}
 
                 <QRCodeCanvas value={b.qrCode || b._id} size={128} />
                 <p style={{ marginTop: "10px", fontStyle: "italic" }}>

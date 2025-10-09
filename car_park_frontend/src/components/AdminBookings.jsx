@@ -3,7 +3,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import axiosInstance from "../api/axiosInstance";
 import "./AdminBooking.css";
 
-// Normalize status to handle undefined
 const normalizeStatus = (status) => {
   if (!status) return "pending";
   const s = status.toLowerCase();
@@ -14,12 +13,12 @@ const normalizeStatus = (status) => {
 const getStatusColor = (status) => {
   switch (normalizeStatus(status)) {
     case "pending":
-      return "#FFC107"; // orange
+      return "#FFC107";
     case "approved":
-      return "#28a745"; // green
+      return "#28a745";
     case "rejected":
     case "cancelled":
-      return "#6c757d"; // grey
+      return "#6c757d";
     default:
       return "#6c757d";
   }
@@ -30,7 +29,6 @@ const AdminBookings = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch bookings from API
   const fetchBookings = async () => {
     try {
       const res = await axiosInstance.get("/bookings/all");
@@ -46,7 +44,6 @@ const AdminBookings = () => {
     fetchBookings();
   }, []);
 
-  // Approve / Reject booking
   const updateStatus = async (id, type) => {
     try {
       const url =
@@ -61,7 +58,6 @@ const AdminBookings = () => {
     }
   };
 
-  // Cancel booking
   const cancelBooking = async (id) => {
     try {
       await axiosInstance.delete(`/bookings/${id}`);
@@ -72,13 +68,30 @@ const AdminBookings = () => {
     }
   };
 
-  // Open payment slip in new tab
-  const viewSlip = (filePath) => {
-    const url = filePath.startsWith("http") ? filePath : `${window.location.origin}/${filePath}`;
+  // Inside AdminBookings component, add this helper function
+const calculateCost = (booking) => {
+  const baseCost = 100; // base cost for first 24 hours (example)
+  if (!booking.bookingDate || !booking.endDate) return baseCost;
+
+  const start = new Date(booking.bookingDate);
+  const end = new Date(booking.endDate);
+  const diffMs = end - start; // difference in milliseconds
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24)); // convert to days
+
+  // Add extra 50 LKR per extra 24 hours beyond first day
+  const extraCost = diffDays > 1 ? (diffDays - 1) * 50 : 0;
+  return baseCost + extraCost;
+};
+
+
+
+
+  // ✅ FIXED: open signed S3 URL directly
+  const viewSlip = (url) => {
+    if (!url) return alert("No payment slip available.");
     window.open(url, "_blank");
   };
 
-  // Filtered bookings
   const filteredBookings = useMemo(() => {
     if (!searchTerm) return bookings;
     const term = searchTerm.toLowerCase();
@@ -114,92 +127,92 @@ const AdminBookings = () => {
         <p>No bookings found.</p>
       ) : (
         <table>
-          <thead>
-            <tr>
-              <th>Slot</th>
-              <th>User/Guest</th>
-              <th>NIC</th>
-              <th>Vehicle Number</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Payment Slip</th>
-              <th>QR Code</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBookings.map((b) => {
-              const status = normalizeStatus(b.status);
+  <tr>
+    <th>Slot</th>
+    <th>User/Guest</th>
+    <th>NIC</th>
+    <th>Vehicle Number</th>
+    <th>Date</th>
+    <th>Cost (LKR)</th> {/* New column */}
+    <th>Status</th>
+    <th>Payment Slip</th>
+    <th>QR Code</th>
+    <th>Actions</th>
+  </tr>
 
-              return (
-                <tr key={b._id}>
-                  <td>{b.slot?.slotNumber || "N/A"}</td>
-                  <td>{b.customer?.username || b.guestName || "Guest"}</td>
-                  <td>{b.customer?.nic || b.customer?.NIC || b.nic || "N/A"}</td>
-                  <td>{b.vehicleNumber || b.customer?.vehicleNumber || "N/A"}</td>
-                  <td>{b.bookingDate ? new Date(b.bookingDate).toLocaleString() : "N/A"}</td>
-                  <td style={{ color: getStatusColor(status) }}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </td>
-                  <td>
-                    {b.paymentSlip ? (
-                      <button
-                        onClick={() => viewSlip(b.paymentSlip)}
-                        style={{
-                          backgroundColor: "#007bff",
-                          color: "#fff",
-                          border: "none",
-                          padding: "5px 10px",
-                          cursor: "pointer",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        View / Download
-                      </button>
-                    ) : (
-                      "No Slip"
-                    )}
-                  </td>
-                  <td>
-                    {b.qrCode ? (
-                      <img src={b.qrCode} alt="QR" style={{ width: 50, height: 50 }} />
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td>
-                    {/* Approve / Reject only if pending and slip exists */}
-                    {status === "pending" && b.paymentSlip && (
-                      <>
-                        <button
-                          onClick={() => updateStatus(b._id, "approve")}
-                          style={{ marginRight: "5px", backgroundColor: "#28a745", color: "#fff" }}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => updateStatus(b._id, "reject")}
-                          style={{ marginRight: "5px", backgroundColor: "#dc3545", color: "#fff" }}
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {/* Cancel button for approved or pending */}
-                    {(status === "pending" || status === "approved" || status === "rejected") && (
-                      <button
-                        onClick={() => cancelBooking(b._id)}
-                        style={{ backgroundColor: "#6c757d", color: "#fff" }}
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+  {filteredBookings.map((b) => {
+    const status = normalizeStatus(b.status);
+    const cost = calculateCost(b); // calculate cost here
+
+    return (
+      <tr key={b._id}>
+        <td>{b.slot?.slotNumber || "N/A"}</td>
+        <td>{b.customer?.username || b.guestName || "Guest"}</td>
+        <td>{b.customer?.nic || b.customer?.NIC || b.nic || "N/A"}</td>
+        <td>{b.vehicleNumber || b.customer?.vehicleNumber || "N/A"}</td>
+        <td>{b.bookingDate ? new Date(b.bookingDate).toLocaleString() : "N/A"}</td>
+        <td>{cost}</td> {/* Show calculated cost */}
+        <td style={{ color: getStatusColor(status) }}>
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </td>
+        <td>
+          {b.paymentSlipUrl ? (
+            <button
+              onClick={() => viewSlip(b.paymentSlipUrl)}
+              style={{
+                backgroundColor: "#007bff",
+                color: "#fff",
+                border: "none",
+                padding: "5px 10px",
+                cursor: "pointer",
+                borderRadius: "4px",
+              }}
+            >
+              View / Download
+            </button>
+          ) : (
+            "No Slip"
+          )}
+        </td>
+        <td>
+          {b.qrCode ? (
+            <img src={b.qrCode} alt="QR" style={{ width: 50, height: 50 }} />
+          ) : (
+            "N/A"
+          )}
+        </td>
+        
+        <td>
+          {status === "pending" && b.paymentSlipUrl && (
+            <>
+              <button
+                onClick={() => updateStatus(b._id, "approve")}
+                style={{ marginRight: "5px", backgroundColor: "#28a745", color: "#fff" }}
+              >
+                Approve
+              </button>
+              <button
+                onClick={() => updateStatus(b._id, "reject")}
+                style={{ marginRight: "5px", backgroundColor: "#dc3545", color: "#fff" }}
+              >
+                Reject
+              </button>
+            </>
+          )}
+          {(status === "pending" || status === "approved" || status === "rejected") && (
+            <button
+              onClick={() => cancelBooking(b._id)}
+              style={{ backgroundColor: "#6c757d", color: "#fff" }}
+            >
+              Cancel
+            </button>
+          )}
+        </td>
+      </tr>
+    );
+  })}
+</table>
+
       )}
     </div>
   );
