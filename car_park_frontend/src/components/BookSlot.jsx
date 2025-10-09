@@ -133,7 +133,7 @@ const BookSlot = () => {
       </div>
 
       {/* Booking Date & Time */}
-      <div className="booking-datetime-section">
+      {/*<div className="booking-datetime-section">
         <label htmlFor="booking-datetime">Select Booking Date & Time:</label>
         <input
           type="datetime-local"
@@ -142,9 +142,10 @@ const BookSlot = () => {
           onChange={(e) => setBookingDateTime(e.target.value)}
           min={new Date().toISOString().slice(0, 16)} // prevent past datetime
         />
-      </div>
+      </div>*/}
 
       {/* Payment Slip Upload */}
+      <br />
       <div className="payment-slip-section">
         <label htmlFor="payment-slip" className="payment-slip-label">
           Upload Payment Slip
