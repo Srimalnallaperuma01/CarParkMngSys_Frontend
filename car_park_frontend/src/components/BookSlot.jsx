@@ -1,3 +1,4 @@
+// src/components/BookSlot.jsx
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
@@ -5,7 +6,7 @@ import { UserContext } from "../context/UserContext";
 import { SlotsContext } from "../context/SlotContext";
 import "./BookSlot.css";
 
-// Normalize status
+// Normalize slot status
 const normalizeStatus = (status) => {
   if (!status) return "available";
   const s = status.toLowerCase();
@@ -18,10 +19,14 @@ const normalizeStatus = (status) => {
 // Map status to colors
 const getStatusColor = (status) => {
   switch (normalizeStatus(status)) {
-    case "available": return "#28a745"; // green
-    case "pending": return "#FFC107";   // orange
-    case "booked": return "#dc3545";    // red
-    default: return "#6c757d";          // grey
+    case "available":
+      return "#28a745";
+    case "pending":
+      return "#FFC107";
+    case "booked":
+      return "#dc3545";
+    default:
+      return "#6c757d";
   }
 };
 
@@ -33,6 +38,7 @@ const BookSlot = () => {
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [paymentSlip, setPaymentSlip] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -47,29 +53,55 @@ const BookSlot = () => {
     if (!paymentSlip) return alert("Please upload a payment slip!");
 
     try {
-      const bookingRes = await axiosInstance.post("/bookings", { slotId: selectedSlotId });
-      const bookingId = bookingRes.data.booking._id;
+      setUploading(true);
 
+      // 1️⃣ Create booking
+      const bookingRes = await axiosInstance.post("/bookings", { slotId: selectedSlotId });
+      const booking = bookingRes.data.booking;
+      if (!booking || !booking._id) throw new Error("Booking creation failed");
+
+      const bookingId = booking._id;
+
+      // 2️⃣ Upload payment slip to S3
       const formData = new FormData();
       formData.append("slip", paymentSlip);
-      await axiosInstance.post(`/bookings/${bookingId}/upload-slip`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const uploadRes = await axiosInstance.post(
+        `/bookings/${bookingId}/upload-slip`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-      setBookingSuccess(bookingRes.data);
+      // 3️⃣ Get updated booking
+      const updatedBooking = uploadRes.data.booking;
+      setBookingSuccess(updatedBooking);
+
+      // Reset selection & fetch slots again
       fetchSlots();
       setSelectedSlotId(null);
       setPaymentSlip(null);
+
+      alert("Booking successful! Payment slip uploaded.");
     } catch (err) {
+      console.error("Booking error:", err);
       alert("Booking failed: " + (err.response?.data?.message || err.message));
+    } finally {
+      setUploading(false);
     }
+  };
+
+  // Open payment slip in a new tab
+  const viewSlip = (filePath) => {
+    const url = filePath.startsWith("http") ? filePath : `${window.location.origin}/${filePath}`;
+    window.open(url, "_blank");
   };
 
   return (
     <div className="book-slot-container">
       <h2>Book a Parking Slot</h2>
 
-      {/* Slot cards */}
+      {/* Slots Grid */}
       <div className="slots-grid">
         {slotsData.map((slot) => {
           const status = normalizeStatus(slot.status);
@@ -92,7 +124,7 @@ const BookSlot = () => {
         })}
       </div>
 
-      {/* Payment Slip Upload Section */}
+      {/* Payment Slip Upload */}
       <div className="payment-slip-section">
         <label htmlFor="payment-slip" className="payment-slip-label">
           Upload Payment Slip
@@ -100,29 +132,42 @@ const BookSlot = () => {
         <input
           type="file"
           id="payment-slip"
-          accept="image/*"
+          accept=".jpg,.jpeg,.png,.pdf"
           onChange={(e) => setPaymentSlip(e.target.files[0])}
           className="payment-slip-input"
         />
         {paymentSlip && <span className="payment-slip-name">{paymentSlip.name}</span>}
       </div>
 
-      {/* Book button */}
+      {/* Book Button */}
       <button
         onClick={handleBooking}
-        disabled={!selectedSlotId || !paymentSlip}
+        disabled={!selectedSlotId || !paymentSlip || uploading}
         className="book-button"
       >
-        Book Selected Slot
+        {uploading ? "Booking & Uploading..." : "Book Selected Slot"}
       </button>
 
-      {/* Booking confirmation */}
+      {/* Booking Confirmation */}
       {bookingSuccess && (
         <div className="booking-confirmation">
           <h3>Booking Pending Approval</h3>
-          <p>Slot: {bookingSuccess.booking?.slot?.slotNumber}</p>
+          <p>Slot: {bookingSuccess.slot?.slotNumber}</p>
           <p>User: {currentUser?.name}</p>
           <p>Status: Pending Approval</p>
+
+          {/* View Payment Slip */}
+          {bookingSuccess.paymentSlip && (
+            <p>
+              <strong>Payment Slip:</strong>{" "}
+              <button
+                className="btn-view-slip"
+                onClick={() => viewSlip(bookingSuccess.paymentSlip)}
+              >
+                View / Download
+              </button>
+            </p>
+          )}
         </div>
       )}
     </div>

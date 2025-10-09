@@ -1,3 +1,4 @@
+// src/components/MyBookings.jsx
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import html2canvas from "html2canvas";
@@ -19,10 +20,14 @@ const normalizeStatus = (status) => {
 
 const getStatusColor = (status) => {
   switch (normalizeStatus(status)) {
-    case "pending": return "#FFC107";
-    case "approved": return "#22c55e";
-    case "cancelled": return "#6c757d";
-    default: return "#94a3b8";
+    case "pending":
+      return "#FFC107";
+    case "approved":
+      return "#22c55e";
+    case "cancelled":
+      return "#6c757d";
+    default:
+      return "#94a3b8";
   }
 };
 
@@ -32,17 +37,16 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const qrRefs = useRef({});
 
-  // Fetch bookings for the logged-in user only
+  // Fetch bookings for the logged-in user
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axiosInstance.get("/bookings"); // backend returns only user's bookings
+        const res = await axiosInstance.get("/bookings");
         setBookings(res.data.bookings || res.data);
       } catch (err) {
         console.error("Error fetching bookings:", err);
       }
     };
-
     if (currentUser) fetchBookings();
   }, [currentUser]);
 
@@ -85,6 +89,12 @@ const MyBookings = () => {
     pdf.save(`Parkly_Ticket_${booking._id}.pdf`);
   };
 
+  // Open payment slip in a new tab
+  const viewSlip = (filePath) => {
+    const url = filePath.startsWith("http") ? filePath : `${window.location.origin}/${filePath}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="mybookings-container">
       <h2>My Bookings</h2>
@@ -97,26 +107,71 @@ const MyBookings = () => {
         return (
           <div key={b._id} className="booking-card">
             <div className="booking-strip">
-              <strong>{b.slot?.slotNumber || "N/A"}</strong> | {bookingDate?.toLocaleDateString()} {bookingDate?.toLocaleTimeString()} | 
-              <span className="status-badge" style={{ backgroundColor: getStatusColor(status) }}>
+              <strong>{b.slot?.slotNumber || "N/A"}</strong> |{" "}
+              {bookingDate?.toLocaleDateString()} {bookingDate?.toLocaleTimeString()} |{" "}
+              <span
+                className="status-badge"
+                style={{ backgroundColor: getStatusColor(status) }}
+              >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </span>
             </div>
 
-            {/* Hidden ticket card for PDF generation */}
+            {/* Payment slip button */}
+            {b.paymentSlip && (
+              <p>
+                <strong>Payment Slip:</strong>{" "}
+                <button
+                  className="btn-view-slip"
+                  onClick={() => viewSlip(b.paymentSlip)}
+                >
+                  View / Download
+                </button>
+              </p>
+            )}
+
+            {/* Hidden ticket card for PDF */}
             {status === "approved" && (
               <div ref={(el) => (qrRefs.current[b._id] = el)} className="ticket-card">
                 <h2>Parkly</h2>
-                <p><em>"Your trusted parking partner"</em></p>
+                <p>
+                  <em>"Your trusted parking partner"</em>
+                </p>
                 <hr />
                 <h3>Entrance Ticket</h3>
-                <p><strong>User:</strong> {currentUser.username} | {currentUser.email}</p>
-                <p><strong>Slot:</strong> {b.slot?.slotNumber || "N/A"}</p>
-                <p><strong>Date:</strong> {bookingDate.toLocaleDateString()}</p>
-                <p><strong>Time:</strong> {bookingDate.toLocaleTimeString()}</p>
-                <p><strong>Booking ID:</strong> {b._id}</p>
+                <p>
+                  <strong>User:</strong> {currentUser.username} | {currentUser.email}
+                </p>
+                <p>
+                  <strong>Slot:</strong> {b.slot?.slotNumber || "N/A"}
+                </p>
+                <p>
+                  <strong>Date:</strong> {bookingDate.toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Time:</strong> {bookingDate.toLocaleTimeString()}
+                </p>
+                <p>
+                  <strong>Booking ID:</strong> {b._id}
+                </p>
+
+                {/* Include payment slip if available */}
+                {b.paymentSlip && (
+                  <p>
+                    <strong>Payment Slip:</strong>{" "}
+                    <button
+                      className="btn-view-slip"
+                      onClick={() => viewSlip(b.paymentSlip)}
+                    >
+                      View / Download
+                    </button>
+                  </p>
+                )}
+
                 <QRCodeCanvas value={b.qrCode || b._id} size={128} />
-                <p style={{ marginTop: "10px", fontStyle: "italic" }}>"Park smart, park safely!"</p>
+                <p style={{ marginTop: "10px", fontStyle: "italic" }}>
+                  "Park smart, park safely!"
+                </p>
               </div>
             )}
 

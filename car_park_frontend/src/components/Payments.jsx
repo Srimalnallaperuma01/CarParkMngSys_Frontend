@@ -4,58 +4,110 @@ import axiosInstance from "../api/axiosInstance";
 import "./Payments.css";
 
 const Payments = () => {
-  const [payments, setPayments] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [uploadingId, setUploadingId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
+  // Fetch bookings with payments
   useEffect(() => {
-    const fetchPayments = async () => {
+    const fetchBookings = async () => {
       try {
         setLoading(true);
         const res = await axiosInstance.get("/bookings");
-        const bookings = res.data.bookings || res.data;
+        const data = res.data.bookings || res.data;
 
-        // Include all bookings that have a payment slip or approved booking
-        const relevantBookings = bookings.filter(
+        // Only show bookings with paymentSlip or approved
+        const relevant = data.filter(
           (b) => b.paymentSlip || b.status?.toLowerCase() === "approved"
         );
 
-        setPayments(relevantBookings);
+        setBookings(relevant);
         setError(null);
       } catch (err) {
-        console.error("Error fetching payments:", err);
-        setError("Failed to fetch payments.");
+        console.error("Error fetching bookings:", err);
+        setError("Failed to fetch bookings.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPayments();
+    fetchBookings();
   }, []);
 
   const getStatusColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "pending":
-        return "#facc15"; // yellow
+        return "#facc15";
       case "approved":
       case "received":
-        return "#22c55e"; // green
+        return "#22c55e";
       case "rejected":
-        return "#ef4444"; // red
+        return "#ef4444";
       default:
-        return "#94a3b8"; // gray
+        return "#94a3b8";
     }
   };
 
-  if (loading) return <p>Loading payments...</p>;
+  // File selection
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  // Upload payment slip
+  const handleUpload = async (bookingId) => {
+    if (!selectedFile) return alert("Please select a file first.");
+    try {
+      setUploadingId(bookingId);
+      const formData = new FormData();
+      formData.append("slip", selectedFile);
+
+      const res = await axiosInstance.post(
+        `/bookings/${bookingId}/upload-slip`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      const updatedBooking = res.data.booking;
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === bookingId
+            ? { ...b, paymentSlip: updatedBooking.paymentSlip, paymentSlipUrl: updatedBooking.paymentSlipUrl }
+            : b
+        )
+      );
+
+      setSelectedFile(null);
+      alert("Payment slip uploaded successfully!");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert(
+        "Failed to upload payment slip: " +
+          (err.response?.data?.message || err.message)
+      );
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  // View / download slip using signed URL
+  const viewSlip = (signedUrl) => {
+    if (!signedUrl) return alert("No payment slip available.");
+    window.open(signedUrl, "_blank");
+  };
+
+  if (loading) return <p>Loading bookings...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (payments.length === 0) return <p>No bookings/payment slips available.</p>;
+  if (bookings.length === 0)
+    return <p>No bookings/payment slips available.</p>;
 
   return (
     <div className="payments-container">
       <h2>My Payments</h2>
       <ul>
-        {payments.map((b) => {
+        {bookings.map((b) => {
           const slotStatus = b.status?.toLowerCase() || "pending";
           const paymentStatus =
             slotStatus === "approved" ? "Received" : b.paymentStatus || "Pending";
@@ -78,9 +130,7 @@ const Payments = () => {
                 borderLeft: `6px solid ${getStatusColor(slotStatus)}`,
               }}
             >
-              <p>
-                <strong>Booking ID:</strong> {b._id}
-              </p>
+              <p><strong>Booking ID:</strong> {b._id}</p>
               <p>
                 <strong>Slot:</strong> {b.slot?.slotNumber || b.slot?.name || "-"} |{" "}
                 {bookingDate && (
@@ -92,28 +142,51 @@ const Payments = () => {
               </p>
               <p>
                 <strong>Slot Status:</strong>{" "}
-                <span style={{ color: getStatusColor(slotStatus), fontWeight: "bold" }}>
+                <span
+                  style={{
+                    color: getStatusColor(slotStatus),
+                    fontWeight: "bold",
+                  }}
+                >
                   {slotStatus.charAt(0).toUpperCase() + slotStatus.slice(1)}
                 </span>
               </p>
               <p>
                 <strong>Payment Status:</strong>{" "}
-                <span style={{ color: getStatusColor(paymentStatus), fontWeight: "bold" }}>
+                <span
+                  style={{
+                    color: getStatusColor(paymentStatus),
+                    fontWeight: "bold",
+                  }}
+                >
                   {paymentStatus}
                 </span>
               </p>
-              {b.paymentSlip && (
+
+              {b.paymentSlip ? (
                 <p>
                   <strong>Slip:</strong>{" "}
-                  <a
-                    href={`http://localhost:5000/uploads/payments/${b.paymentSlip}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
->
-                        View / Download
-                  </a>
-
+                  <button
+                    onClick={() => viewSlip(b.paymentSlipUrl)}
+                    className="btn-view-slip"
+                  >
+                    View / Download
+                  </button>
                 </p>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".jpg,.jpeg,.png,.pdf"
+                  />
+                  <button
+                    onClick={() => handleUpload(b._id)}
+                    disabled={uploadingId === b._id}
+                  >
+                    {uploadingId === b._id ? "Uploading..." : "Upload Slip"}
+                  </button>
+                </div>
               )}
             </li>
           );

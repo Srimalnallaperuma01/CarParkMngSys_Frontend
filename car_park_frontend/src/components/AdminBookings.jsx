@@ -3,8 +3,16 @@ import React, { useEffect, useState, useMemo } from "react";
 import axiosInstance from "../api/axiosInstance";
 import "./AdminBooking.css";
 
+// Normalize status to handle undefined
+const normalizeStatus = (status) => {
+  if (!status) return "pending";
+  const s = status.toLowerCase();
+  if (["pending", "approved", "rejected", "cancelled"].includes(s)) return s;
+  return "unknown";
+};
+
 const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
+  switch (normalizeStatus(status)) {
     case "pending":
       return "#FFC107"; // orange
     case "approved":
@@ -38,6 +46,7 @@ const AdminBookings = () => {
     fetchBookings();
   }, []);
 
+  // Approve / Reject booking
   const updateStatus = async (id, type) => {
     try {
       const url =
@@ -48,44 +57,42 @@ const AdminBookings = () => {
       );
     } catch (err) {
       console.error(err.response?.data?.message || err.message);
+      alert("Failed to update status.");
     }
   };
 
+  // Cancel booking
   const cancelBooking = async (id) => {
     try {
       await axiosInstance.delete(`/bookings/${id}`);
       setBookings((prev) => prev.filter((b) => b._id !== id));
     } catch (err) {
       console.error(err.response?.data?.message || err.message);
+      alert("Failed to cancel booking.");
     }
   };
 
-  // Filtered bookings based on search term (NIC or Vehicle Number)
+  // Open payment slip in new tab
+  const viewSlip = (filePath) => {
+    const url = filePath.startsWith("http") ? filePath : `${window.location.origin}/${filePath}`;
+    window.open(url, "_blank");
+  };
+
+  // Filtered bookings
   const filteredBookings = useMemo(() => {
-  if (!searchTerm) return bookings;
-
-  return bookings.filter((b) => {
-    const nic =
-      b.customer?.nic ||
-      b.customer?.NIC ||
-      b.nic ||
-      ""; // fallback
-    const vehicle =
-      b.vehicleNumber ||
-      b.customer?.vehicleNumber ||
-      "";
-    const slotNumber =
-      b.slot?.slotNumber?.toString() || b.slot?.name?.toString() || "";
-
+    if (!searchTerm) return bookings;
     const term = searchTerm.toLowerCase();
-    return (
-      nic.toLowerCase().includes(term) ||
-      vehicle.toLowerCase().includes(term) ||
-      slotNumber.toLowerCase().includes(term)
-    );
-  });
-}, [bookings, searchTerm]);
-
+    return bookings.filter((b) => {
+      const nic = b.customer?.nic || b.customer?.NIC || b.nic || "";
+      const vehicle = b.vehicleNumber || b.customer?.vehicleNumber || "";
+      const slotNumber = b.slot?.slotNumber?.toString() || b.slot?.name?.toString() || "";
+      return (
+        nic.toLowerCase().includes(term) ||
+        vehicle.toLowerCase().includes(term) ||
+        slotNumber.toLowerCase().includes(term)
+      );
+    });
+  }, [bookings, searchTerm]);
 
   if (loading) return <p>Loading bookings...</p>;
 
@@ -96,7 +103,7 @@ const AdminBookings = () => {
       <div style={{ marginBottom: "10px" }}>
         <input
           type="text"
-          placeholder="Search by NIC or Vehicle Number"
+          placeholder="Search by NIC, Vehicle or Slot"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ padding: "8px", width: "300px" }}
@@ -107,7 +114,7 @@ const AdminBookings = () => {
         <p>No bookings found.</p>
       ) : (
         <table>
-          
+          <thead>
             <tr>
               <th>Slot</th>
               <th>User/Guest</th>
@@ -119,102 +126,79 @@ const AdminBookings = () => {
               <th>QR Code</th>
               <th>Actions</th>
             </tr>
-          
-            {filteredBookings.map((b) => (
-              <tr key={b._id}>
-                <td>{b.slot?.slotNumber || "N/A"}</td>
-                <td>{b.customer?.username || b.guestName || "Guest"}</td>
-                <td>
-                  {b.customer?.nic ||
-                    b.customer?.NIC ||
-                    b.nic ||
-                    "N/A"}
-                </td>
-                <td>
-                  {b.vehicleNumber ||
-                    b.customer?.vehicleNumber ||
-                    "N/A"}
-                </td>
-                <td>
-                  {b.bookingDate
-                    ? new Date(b.bookingDate).toLocaleString()
-                    : "N/A"}
-                </td>
-                <td style={{ color: getStatusColor(b.status) }}>
-                  {b.status
-                    ? b.status.charAt(0).toUpperCase() + b.status.slice(1)
-                    : "N/A"}
-                </td>
-                <td>
-                  {b.paymentSlip ? (
-                    <a
-                      href={`http://localhost:5000/uploads/payments/${b.paymentSlip}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View
-                    </a>
-                  ) : (
-                    "No Slip"
-                  )}
-                </td>
-                <td>
-                  {b.qrCode ? (
-                    <img
-                      src={b.qrCode}
-                      alt="QR"
-                      style={{ width: 50, height: 50 }}
-                    />
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-                <td>
-                  {b.status.toLowerCase() === "pending" && (
-                    <>
+          </thead>
+          <tbody>
+            {filteredBookings.map((b) => {
+              const status = normalizeStatus(b.status);
+
+              return (
+                <tr key={b._id}>
+                  <td>{b.slot?.slotNumber || "N/A"}</td>
+                  <td>{b.customer?.username || b.guestName || "Guest"}</td>
+                  <td>{b.customer?.nic || b.customer?.NIC || b.nic || "N/A"}</td>
+                  <td>{b.vehicleNumber || b.customer?.vehicleNumber || "N/A"}</td>
+                  <td>{b.bookingDate ? new Date(b.bookingDate).toLocaleString() : "N/A"}</td>
+                  <td style={{ color: getStatusColor(status) }}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </td>
+                  <td>
+                    {b.paymentSlip ? (
                       <button
-                        onClick={() => updateStatus(b._id, "approve")}
+                        onClick={() => viewSlip(b.paymentSlip)}
                         style={{
-                          marginRight: "5px",
-                          backgroundColor: "#28a745",
+                          backgroundColor: "#007bff",
                           color: "#fff",
+                          border: "none",
+                          padding: "5px 10px",
+                          cursor: "pointer",
+                          borderRadius: "4px",
                         }}
                       >
-                        Approve
+                        View / Download
                       </button>
+                    ) : (
+                      "No Slip"
+                    )}
+                  </td>
+                  <td>
+                    {b.qrCode ? (
+                      <img src={b.qrCode} alt="QR" style={{ width: 50, height: 50 }} />
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>
+                    {/* Approve / Reject only if pending and slip exists */}
+                    {status === "pending" && b.paymentSlip && (
+                      <>
+                        <button
+                          onClick={() => updateStatus(b._id, "approve")}
+                          style={{ marginRight: "5px", backgroundColor: "#28a745", color: "#fff" }}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => updateStatus(b._id, "reject")}
+                          style={{ marginRight: "5px", backgroundColor: "#dc3545", color: "#fff" }}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {/* Cancel button for approved or pending */}
+                    {(status === "pending" || status === "approved" || status === "rejected") && (
                       <button
-                        onClick={() => updateStatus(b._id, "reject")}
-                        style={{
-                          marginRight: "5px",
-                          backgroundColor: "#dc3545",
-                          color: "#fff",
-                        }}
+                        onClick={() => cancelBooking(b._id)}
+                        style={{ backgroundColor: "#6c757d", color: "#fff" }}
                       >
-                        Reject
+                        Cancel
                       </button>
-                    </>
-                  )}
-                  {(b.status.toLowerCase() === "pending" ||
-                    b.status.toLowerCase() === "approved") && (
-                    <button
-                      onClick={() => cancelBooking(b._id)}
-                      style={{ backgroundColor: "#6c757d", color: "#fff" }}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                  {b.status.toLowerCase() === "rejected" && (
-                    <button
-                      onClick={() => cancelBooking(b._id)}
-                      style={{ backgroundColor: "#6c757d", color: "#fff" }}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       )}
     </div>
